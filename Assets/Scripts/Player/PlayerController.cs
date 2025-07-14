@@ -1,179 +1,119 @@
 ﻿using Unity.Android.Gradle.Manifest;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    private CharacterController characterController;
     private Animator animator;
+    private CharacterController characterController;
     private Vector2 moveInput;
-    private Vector2 lookInput;
-    private bool sprintInput;
-    private bool walkInput;
-
-    private float currentSpeed;
-    private float speedVelocity;
+    private bool isWalking;
+    private bool isSprinting;
     private float turnSmoothVelocity;
-    private float verticalVelocity;
-    private bool groundedLastFrame = true;
+    private float verticalVelocity = 0f;
+    private bool wasGrounded = true;
+    private float fallStartHeight = 0f;
     private bool isLanding = false;
-    private float lastGroundedY;
-    private float fallStartY;
-    private bool bigFall = false;
 
-    public float WalkSpeed = 3f;
-    public float JogSpeed = 6f;
-    public float RunSpeed = 9f;
-    public float AccelerationTime = 0.2f;
-    public float DecelerationTime = 0.05f;
-    public float Gravity = -15f;
-    public float MinLandHeight = 1.5f;
+    public Camera MainCamera;
 
-    public Transform CameraTransform;
-    public float RotationSmoothTime = 0.1f;
+    public float WalkSpeed = 2f;
+    public float JogSpeed = 4f;
+    public float RunSpeed = 6f;
+
+    public float TurnSmoothTime = 0.1f;
+
+    public float Gravity = -1f;
+    public float GroundStickForce = 5f;
+    public float GroundCheckDistance = 0.2f;
+
+    public float FallThreshold = 3f;
 
     public Vector2 MoveInput { get => moveInput; set => moveInput = value; }
-    public Vector2 LookInput { get => lookInput; set => lookInput = value; }
-    public bool SprintInput { get => sprintInput; set => sprintInput = value; }
-    public bool WalkInput { get => walkInput; set => walkInput = value; }
+    public bool IsWalking { get => isWalking; set => isWalking = value; }
+    public bool IsSprinting { get => isSprinting; set => isSprinting = value; }
 
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
-
-        verticalVelocity = -2f;
-        groundedLastFrame = true;
-        lastGroundedY = transform.position.y;
     }
 
-    void Update()
+    private void Update()
     {
-        bool justLanded = MoveAndComputeLanding();
+        bool grounded = characterController.isGrounded;
 
-        if (justLanded)
+        if (grounded && !wasGrounded)
         {
-            isLanding = bigFall;
+            float fallDistance = fallStartHeight - transform.position.y;
+            if (fallDistance > FallThreshold)
+            {
+                isLanding = true;
+                animator.SetBool("IsFalling", false);
+                animator.SetTrigger("Land");
+            }
+        }
+        else if (!grounded && wasGrounded)
+        {
+            fallStartHeight = transform.position.y;
         }
 
-        bool realGrounded = characterController.isGrounded;
-        float realVerticalVelocity = verticalVelocity;
-
-        bool animatorGrounded;
-        float animatorVerticalVelocity;
-
-        if (!bigFall)
-        {
-            animatorGrounded = true;
-            animatorVerticalVelocity = 0f;
-        }
-        else
-        {
-            animatorGrounded = realGrounded;
-            animatorVerticalVelocity = justLanded ? 0f : realVerticalVelocity;
-        }
-        animator.SetBool("isGrounded", animatorGrounded);
-
-        animator.SetFloat("verticalVelocity", animatorVerticalVelocity);
+        wasGrounded = grounded;
 
         if (isLanding)
         {
-            animator.SetFloat("speed", 0f);
+            AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+            if (state.IsName("Land") && state.normalizedTime >= 1f)
+            {
+                isLanding = false;
+            }
             return;
         }
 
-        animator.SetFloat("speed", currentSpeed);
-    }
-
-    public void EndLanding()
-    {
-        isLanding = false;
-    }
-
-    bool MoveAndComputeLanding()
-    {
-        Vector3 horizontal = Vector3.zero;
-        if (!isLanding)
+        if (!grounded)
         {
-            Vector3 inputDirection = new Vector3(moveInput.x, 0, moveInput.y).normalized;
-            if (inputDirection.magnitude >= 0.1f)
+            float fallen = fallStartHeight - transform.position.y;
+            if (fallen > FallThreshold)
             {
-                float targetAngle = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + CameraTransform.eulerAngles.y;
-                float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, RotationSmoothTime);
-                transform.rotation = Quaternion.Euler(0, angle, 0);
-
-                float baseSpeed;
-                if (sprintInput)
-                {
-                    baseSpeed = RunSpeed;
-                }
-                else if (walkInput)
-                {
-                    baseSpeed = WalkSpeed;
-                }
-                else
-                {
-                    baseSpeed = (inputDirection.magnitude < 0.5f) ? WalkSpeed : JogSpeed;
-                }
-
-                float targetSpeed = baseSpeed * inputDirection.magnitude;
-                float smoothTime = (targetSpeed > currentSpeed) ? AccelerationTime : DecelerationTime;
-                currentSpeed = Mathf.SmoothDamp(currentSpeed, targetSpeed, ref speedVelocity, smoothTime);
-
-                if (inputDirection.magnitude < 0.1f && currentSpeed < 0.1f)
-                {
-                    currentSpeed = 0f; speedVelocity = 0f;
-                }
-
-                horizontal = Quaternion.Euler(0, angle, 0) * Vector3.forward * currentSpeed;
-            }
-            else
-            {
-                currentSpeed = Mathf.SmoothDamp(currentSpeed, 0f, ref speedVelocity, DecelerationTime);
-                if (currentSpeed < 0.1f)
-                {
-                    currentSpeed = 0f; speedVelocity = 0f;
-                }
-            }
+                animator.SetBool("IsFalling", true);
+            }    
         }
 
-        float previousY = transform.position.y;
-        if (!characterController.isGrounded)
+        if (grounded && verticalVelocity < 0f)
+        {
+            verticalVelocity = -GroundStickForce;
+        }
+        else
         {
             verticalVelocity += Gravity * Time.deltaTime;
-        }  
-
-        if (groundedLastFrame && !characterController.isGrounded)
-        {
-            fallStartY = previousY;
-            bigFall = false;
         }
 
-        if (!characterController.isGrounded)
+        Vector3 rawMove = Vector3.zero;
+        Vector3 inputDirection = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
+
+        if (inputDirection.magnitude >= 0.1f)
         {
-            if (fallStartY - previousY > MinLandHeight)
+            float targetAngle = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + MainCamera.transform.eulerAngles.y;
+            float smoothedAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, TurnSmoothTime);
+            transform.rotation = Quaternion.Euler(0f, smoothedAngle, 0f);
+
+            float targetSpeed = isSprinting ? RunSpeed : isWalking ? WalkSpeed : JogSpeed;
+
+            rawMove = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
+
+            if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, characterController.height / 2 + GroundCheckDistance))
             {
-                bigFall = true;
-            }   
+                rawMove = Vector3.ProjectOnPlane(rawMove, hit.normal).normalized;
+            }
+
+            rawMove *= targetSpeed;
+            animator.SetFloat("Speed", targetSpeed / RunSpeed, 0.1f, Time.deltaTime);
+        }
+        else
+        {
+            animator.SetFloat("Speed", 0f, 0.1f, Time.deltaTime);
         }
 
-        characterController.Move((horizontal + Vector3.up * verticalVelocity) * Time.deltaTime);
-
-        bool groundedNow = characterController.isGrounded;
-        bool justLandedNow = !groundedLastFrame && groundedNow;
-        groundedLastFrame = groundedNow;
-
-        if (justLandedNow)
-        {
-            lastGroundedY = transform.position.y;
-            isLanding = false;
-        }   
-
-        if (groundedNow && !justLandedNow)
-        {
-            verticalVelocity = -2f;
-        }   
-
-        return justLandedNow;
+        Vector3 finalMove = rawMove + Vector3.up * verticalVelocity;
+        characterController.Move(finalMove * Time.deltaTime);
     }
 }

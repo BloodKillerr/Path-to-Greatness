@@ -17,20 +17,15 @@ public class InputManager : MonoBehaviour
         playerController.MoveInput = context.ReadValue<Vector2>();
     }
 
-    public void LookEvent(InputAction.CallbackContext context)
-    {
-        playerController.LookInput = context.ReadValue<Vector2>();
-    }
-
     public void SprintEvent(InputAction.CallbackContext context)
     {
-        if(context.performed)
+        if (context.performed)
         {
-            playerController.SprintInput = true;
+            playerController.IsSprinting = true;
         }
         else if(context.canceled)
         {
-            playerController.SprintInput = false;
+            playerController.IsSprinting = false;
         }
     }
 
@@ -38,11 +33,11 @@ public class InputManager : MonoBehaviour
     {
         if (context.performed)
         {
-            playerController.WalkInput = true;
+            playerController.IsWalking = true;
         }
         else if (context.canceled)
         {
-            playerController.WalkInput = false;
+            playerController.IsWalking = false;
         }
     }
 }
