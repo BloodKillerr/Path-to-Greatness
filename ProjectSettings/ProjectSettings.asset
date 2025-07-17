@@ -12,7 +12,7 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
+  companyName: BloodKillerr
   productName: Path to Greatness
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
@@ -838,8 +838,8 @@ PlayerSettings:
   editorAssembliesCompatibilityLevel: 1
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: Path to Greatness
-  metroPackageVersion: 
+  metroPackageName: PathtoGreatness
+  metroPackageVersion: 1.0.0.0
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
@@ -847,7 +847,7 @@ PlayerSettings:
   metroCertificateNotAfter: 0000000000000000
   metroApplicationDescription: Path to Greatness
   wsaImages: {}
-  metroTileShortName: 
+  metroTileShortName: Path to Greatness
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0
