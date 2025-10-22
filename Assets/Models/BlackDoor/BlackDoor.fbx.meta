@@ -3,7 +3,12 @@ guid: a5be05f1391c06c4280219f8771b4d28
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BlackDoor_1_Material
+    second: {fileID: 2100000, guid: 6c36c5caf26a2084693f2e3bec08c394, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

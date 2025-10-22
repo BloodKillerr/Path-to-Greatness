@@ -1,7 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using TMPro;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.DualShock;
+using UnityEngine.InputSystem.XInput;
 
 ////TODO: localization support
 
@@ -55,7 +59,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
         /// <summary>
         /// Text component that receives the name of the action. Optional.
         /// </summary>
-        public Text actionLabel
+        public TMP_Text actionLabel
         {
             get => m_ActionLabel;
             set
@@ -69,7 +73,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
         /// Text component that receives the display string of the binding. Can be <c>null</c> in which
         /// case the component entirely relies on <see cref="updateBindingUIEvent"/>.
         /// </summary>
-        public Text bindingText
+        public TMP_Text bindingText
         {
             get => m_BindingText;
             set
@@ -84,7 +88,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
         /// </summary>
         /// <seealso cref="startRebindEvent"/>
         /// <seealso cref="rebindOverlay"/>
-        public Text rebindPrompt
+        public TMP_Text rebindPrompt
         {
             get => m_RebindText;
             set => m_RebindText = value;
@@ -219,15 +223,80 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
 
             if (action.bindings[bindingIndex].isComposite)
             {
-                // It's a composite. Remove overrides from part bindings.
-                for (var i = bindingIndex + 1; i < action.bindings.Count && action.bindings[i].isPartOfComposite; ++i)
-                    action.RemoveBindingOverride(i);
+                for (int partIndex = bindingIndex + 1;
+                     partIndex < action.bindings.Count && action.bindings[partIndex].isPartOfComposite;
+                     ++partIndex)
+                {
+                    if (!SwapResetBindings(action, partIndex))
+                    {
+                        action.RemoveBindingOverride(partIndex);
+                    }
+                }
+
+                UpdateBindingDisplay();
+                return;
             }
-            else
+
+            if (SwapResetBindings(action, bindingIndex))
             {
-                action.RemoveBindingOverride(bindingIndex);
+                UpdateBindingDisplay();
+                return;
             }
+
+            action.RemoveBindingOverride(bindingIndex);
             UpdateBindingDisplay();
+        }
+
+        private bool SwapResetBindings(InputAction action, int bindingIndex)
+        {
+            var newBinding = action.bindings[bindingIndex];
+
+            if (string.IsNullOrEmpty(newBinding.overridePath))
+                return false;
+
+            var defaultPath = newBinding.path;
+
+            for (int siblingIndex = 0; siblingIndex < action.bindings.Count; ++siblingIndex)
+            {
+                var sibling = action.bindings[siblingIndex];
+                if (sibling.id == newBinding.id)
+                    continue;
+
+                if (sibling.effectivePath == defaultPath)
+                {
+                    action.ApplyBindingOverride(siblingIndex, newBinding.overridePath);
+                    action.RemoveBindingOverride(bindingIndex);
+                    return true;
+                }
+            }
+
+            foreach (var globalBinding in action.actionMap.bindings)
+            {
+                if (globalBinding.action == newBinding.action)
+                    continue; // skip any binding belonging to the same action (we already checked those)
+
+                if (globalBinding.effectivePath == defaultPath)
+                {
+                    var otherAction = action.actionMap.FindAction(globalBinding.action);
+                    if (otherAction == null)
+                        continue;
+
+                    int otherLocalIndex = otherAction.bindings
+                        .IndexOf(x => x.id == globalBinding.id);
+                    if (otherLocalIndex == -1)
+                    {
+                        Debug.LogError(
+                            $"SwapResetBindings: Could not find local index for binding '{globalBinding.id}' in action '{otherAction.name}'.");
+                        continue;
+                    }
+
+                    otherAction.ApplyBindingOverride(otherLocalIndex, newBinding.overridePath);
+                    action.RemoveBindingOverride(bindingIndex);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -239,8 +308,24 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
             if (!ResolveActionAndBinding(out var action, out var bindingIndex))
                 return;
 
-            // If the binding is a composite, we need to rebind each part in turn.
-            if (action.bindings[bindingIndex].isComposite)
+            // Grab the very binding we want to rebind.
+            var binding = action.bindings[bindingIndex];
+
+            // 1) If this binding belongs to a group (e.g. "Xbox", "PlayStation", or "Keyboard&Mouse"),
+            //    check if at least one device for that scheme is actually present.
+            if (!IsBindingCurrentlySupported(action, bindingIndex))
+            {
+                // Show a quick "controller not detected" prompt (optional).
+                if (m_RebindText != null)
+                    m_RebindText.text = "<Device not detected>";
+                return; // bail out before calling PerformInteractiveRebind.
+            }
+
+            // 2) If we get here, the correct device‐family is present. Proceed as before:
+            if (EventSystem.current != null)
+                EventSystem.current.sendNavigationEvents = false;
+
+            if (binding.isComposite)
             {
                 var firstPartIndex = bindingIndex + 1;
                 if (firstPartIndex < action.bindings.Count && action.bindings[firstPartIndex].isPartOfComposite)
@@ -252,61 +337,210 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
             }
         }
 
+        private static bool IsBindingSupportedByGroup(InputBinding binding)
+        {
+            if (string.IsNullOrEmpty(binding.groups))
+                return false; // no groups means “no group to check”—caller will fall back to path-based.
+
+            // Split on ';' and remove any empty entries:
+            var groups = binding
+                .groups
+                .Split(new[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var raw in groups)
+            {
+                var trimmed = raw.Trim();
+                switch (trimmed)
+                {
+                    case "Keyboard":
+                        if (Keyboard.current != null || Mouse.current != null)
+                            return true;
+                        break;
+
+                    case "Gamepad":
+                        if (Gamepad.current != null)
+                            return true;
+                        break;
+
+                    default:
+                        // If you have other scheme names, handle them here.
+                        // If unknown, assume “supported”:
+                        return true;
+                }
+            }
+
+            // None of the listed groups had a matching device.
+            return false;
+        }
+
+        //
+        // 2) If “groups” is empty or didn’t match, fall back to snippet-only (“path”) check.
+        //
+        private static bool IsBindingSupportedByPath(string path)
+        {
+            if (string.IsNullOrEmpty(path) || !path.StartsWith("<"))
+                return true;
+
+            // Extract token inside angle brackets, e.g. "<Gamepad>"
+            int slash = path.IndexOf('/');
+            string deviceToken = slash > 0 ? path.Substring(0, slash) : path;
+
+            switch (deviceToken)
+            {
+                case "<Keyboard>":
+                    return Keyboard.current != null;
+
+                case "<Mouse>":
+                    return Mouse.current != null;
+
+                case "<Gamepad>":
+                    // any gamepad (Xbox, PS, etc.)
+                    return Gamepad.current != null;
+
+                default:
+                    // if some other layout (Touchscreen, etc.), allow by default:
+                    return true;
+            }
+        }
+
+        //
+        // 3) “Master” helper that considers composites vs. single bindings:
+        //
+        private static bool IsBindingCurrentlySupported(InputAction action, int bindingIndex)
+        {
+            var binding = action.bindings[bindingIndex];
+
+            // If it’s a composite (e.g. a 2D Vector composite), first attempt “group”:
+            if (binding.isComposite)
+            {
+                // 3a) If the composite itself has a groups string, trust that:
+                if (!string.IsNullOrEmpty(binding.groups))
+                    return IsBindingSupportedByGroup(binding);
+
+                // 3b) Otherwise, look at each “part” that follows (while isPartOfComposite).
+                int nextIndex = bindingIndex + 1;
+                bool anyPartSupported = false;
+                while (nextIndex < action.bindings.Count && action.bindings[nextIndex].isPartOfComposite)
+                {
+                    var part = action.bindings[nextIndex];
+
+                    // Try “group” on the part first:
+                    if (!string.IsNullOrEmpty(part.groups))
+                    {
+                        if (IsBindingSupportedByGroup(part))
+                        {
+                            anyPartSupported = true;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        // Fall back to path-based check for this part:
+                        if (IsBindingSupportedByPath(part.path))
+                        {
+                            anyPartSupported = true;
+                            break;
+                        }
+                    }
+
+                    nextIndex++;
+                }
+
+                return anyPartSupported;
+            }
+
+            // If it’s a part of a composite (but somehow you targeted the part directly),
+            // just do a path-based check on that one:
+            if (binding.isPartOfComposite)
+                return IsBindingSupportedByPath(binding.path);
+
+            // Otherwise it’s a “simple” (non-composite) binding:
+            //  - If it has groups, do group check
+            //  - Else do path check
+            if (!string.IsNullOrEmpty(binding.groups))
+                return IsBindingSupportedByGroup(binding);
+
+            return IsBindingSupportedByPath(binding.path);
+        }
+
         private void PerformInteractiveRebind(InputAction action, int bindingIndex, bool allCompositeParts = false)
         {
             m_RebindOperation?.Cancel(); // Will null out m_RebindOperation.
 
-            void CleanUp()
+            void CleanUp(bool fullRebindFinished)
             {
+                // Re-enable navigation if the rebind is completely finished (either cancelled early or the last part bound)
+                if (fullRebindFinished && EventSystem.current != null)
+                    EventSystem.current.sendNavigationEvents = true;
+
                 m_RebindOperation?.Dispose();
                 m_RebindOperation = null;
-
-                action.actionMap.Enable();
-                m_UIInputActionMap?.Enable();
+                action.Enable();
             }
 
-            // An "InvalidOperationException: Cannot rebind action x while it is enabled" will
-            // be thrown if rebinding is attempted on an action that is enabled.
-            //
-            // On top of disabling the target action while rebinding, it is recommended to
-            // disable any actions (or action maps) that could interact with the rebinding UI
-            // or gameplay - it would be undesirable for rebinding to cause the player
-            // character to jump.
-            //
-            // In this example, we explicitly disable both the UI input action map and
-            // the action map containing the target action.
-            action.actionMap.Disable();
-            m_UIInputActionMap?.Disable();
+            // Fixes the "Cannot rebind action x while it is enabled" error
+            action.Disable();
 
             // Configure the rebind.
             m_RebindOperation = action.PerformInteractiveRebinding(bindingIndex)
-                .OnCancel(
-                    operation =>
-                    {
-                        m_RebindStopEvent?.Invoke(this, operation);
-                        if (m_RebindOverlay != null)
-                            m_RebindOverlay.SetActive(false);
-                        UpdateBindingDisplay();
-                        CleanUp();
-                    })
-                .OnComplete(
-                    operation =>
-                    {
-                        if (m_RebindOverlay != null)
-                            m_RebindOverlay.SetActive(false);
-                        m_RebindStopEvent?.Invoke(this, operation);
-                        UpdateBindingDisplay();
-                        CleanUp();
+                .OnCancel(operation =>
+                {
+                    // <<< CHANGED >>>
+                    // If the user cancels ANY part of the rebind (single or composite), 
+                    // we consider the entire rebind aborted. So we call CleanUp(true).
+                    CleanUp(fullRebindFinished: false);
 
-                        // If there's more composite parts we should bind, initiate a rebind
-                        // for the next part.
-                        if (allCompositeParts)
-                        {
-                            var nextBindingIndex = bindingIndex + 1;
-                            if (nextBindingIndex < action.bindings.Count && action.bindings[nextBindingIndex].isPartOfComposite)
-                                PerformInteractiveRebind(action, nextBindingIndex, true);
-                        }
-                    });
+                    m_RebindStopEvent?.Invoke(this, operation);
+
+                    if (m_RebindOverlay != null)
+                        m_RebindOverlay.SetActive(false);
+
+                    UpdateBindingDisplay();
+                })
+                .OnComplete(operation =>
+                {
+                    // If this was a part of a composite, and there are further parts, do NOT re-enable navigation yet.
+                    bool isLastPart = true;
+                    if (allCompositeParts)
+                    {
+                        var nextBindingIndex = bindingIndex + 1;
+                        if (nextBindingIndex < action.bindings.Count && action.bindings[nextBindingIndex].isPartOfComposite)
+                            isLastPart = false;
+                    }
+
+                    if (m_RebindOverlay != null)
+                        m_RebindOverlay.SetActive(false);
+
+                    m_RebindStopEvent?.Invoke(this, operation);
+
+                    // Check for duplicates, etc. (existing logic)
+                    if (CheckDuplicateBindings(action, bindingIndex, allCompositeParts))
+                    {
+                        action.RemoveBindingOverride(bindingIndex);
+                        // Because we are restarting this same part, we STILL are in the middle of the 
+                        // composite rebind; navigation remains off.
+                        PerformInteractiveRebind(action, bindingIndex, allCompositeParts);
+                        return;
+                    }
+
+                    UpdateBindingDisplay();
+
+                    // If there are more parts in a composite, do NOT yet enable navigation; 
+                    // just kick off the next part.
+                    if (allCompositeParts && !isLastPart)
+                    {
+                        CleanUp(fullRebindFinished: false); // still not done overall
+                        var nextBindingIndex = bindingIndex + 1;
+                        if (nextBindingIndex < action.bindings.Count && action.bindings[nextBindingIndex].isPartOfComposite)
+                            PerformInteractiveRebind(action, nextBindingIndex, true);
+                        return;
+                    }
+
+                    // <<< CHANGED >>>
+                    // If we reach here, either this was a non-composite bind or it was the last part of a composite.
+                    // So we can clean up and re-enable navigation now.
+                    CleanUp(fullRebindFinished: true);
+                });
 
             // If it's a part binding, show the name of the part in the UI.
             var partName = default(string);
@@ -332,6 +566,34 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
             m_RebindStartEvent?.Invoke(this, m_RebindOperation);
 
             m_RebindOperation.Start();
+        }
+
+        private bool CheckDuplicateBindings(InputAction action, int bindingIndex, bool allCompositeParts = false)
+        {
+            InputBinding newBinding = action.bindings[bindingIndex];
+            string newEffectivePath = newBinding.effectivePath;
+
+            foreach (var globalBinding in action.actionMap.bindings)
+            {
+                if (globalBinding.action == newBinding.action)
+                    continue;
+
+                if (globalBinding.effectivePath == newEffectivePath)
+                {
+                    return true;
+                }
+            }
+
+            if (allCompositeParts)
+            {
+                for (int i = 0; i < bindingIndex; ++i)
+                {
+                    if (action.bindings[i].effectivePath == newEffectivePath)
+                        return true;
+                }
+            }
+
+            return false;
         }
 
         protected void OnEnable()
@@ -398,11 +660,11 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
         [Tooltip("Text label that will receive the name of the action. Optional. Set to None to have the "
             + "rebind UI not show a label for the action.")]
         [SerializeField]
-        private Text m_ActionLabel;
+        private TMP_Text m_ActionLabel;
 
         [Tooltip("Text label that will receive the current, formatted binding string.")]
         [SerializeField]
-        private Text m_BindingText;
+        private TMP_Text m_BindingText;
 
         [Tooltip("Optional UI that will be shown while a rebind is in progress.")]
         [SerializeField]
@@ -410,7 +672,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
 
         [Tooltip("Optional text label that will be updated with prompt for user input.")]
         [SerializeField]
-        private Text m_RebindText;
+        private TMP_Text m_RebindText;
 
         [Tooltip("Optional reference to default input actions containing the UI action map. The UI action map is "
             + "disabled when rebinding is in progress.")]
@@ -447,6 +709,33 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
         }
 
         #endif
+
+        private void Start()
+        {
+            UpdateActionLabel();
+            UpdateBindingDisplay();
+        }
+
+        private void Update()
+        {
+            // 1) Resolve the action and binding index just like in StartInteractiveRebind
+            if (!ResolveActionAndBinding(out var action, out var bindingIndex))
+                return;
+
+            // 2) Grab the InputBinding object
+            var binding = action.bindings[bindingIndex];
+
+            // 3) Check whether it’s supported right now
+            bool supported = IsBindingCurrentlySupported(action, bindingIndex);
+
+            // 4) Find a Button component on this GameObject (or a parent, if that’s how you set it up)
+            var btns = GetComponentsInChildren<Button>();
+
+            foreach (var btn in btns)
+            {
+                btn.interactable = supported;
+            }
+        }
 
         private void UpdateActionLabel()
         {
