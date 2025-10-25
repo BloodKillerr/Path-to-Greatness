@@ -63,4 +63,15 @@ public class InputManager : MonoBehaviour
             playerController.WalkInput = !HoldToWalk && playerController.WalkInput;
         }
     }
+
+    public void InteractEvent(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            if (!GameManager.Instance.IsGameStatePaused && !Player.Instance.IsDead)
+            {
+                Player.Instance.InteractEvent.Invoke();
+            }
+        }
+    }
 }

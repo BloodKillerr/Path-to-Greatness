@@ -748,6 +748,7 @@ GameObject:
   - component: {fileID: 8378639673409773528}
   - component: {fileID: 3592454733622766765}
   - component: {fileID: 3316827085034135022}
+  - component: {fileID: 7208286245447834234}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -877,6 +878,26 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: a3758619-8a48-4f2d-8a28-86ccc8ddab64
     m_ActionName: 'Player/Jump[/Keyboard/space]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 243870664006996617}
+        m_TargetAssemblyTypeName: InputManager, Assembly-CSharp
+        m_MethodName: InteractEvent
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: b9b5e855-469b-4f43-a375-5e96ca492285
+    m_ActionName: 'Player/Interact[/Keyboard/e]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: e532f9db-fcea-417d-befb-216a58bd90b9
+    m_ActionName: 'Player/Primary[/Mouse/leftButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard
   m_DefaultActionMap: Player
@@ -1004,6 +1025,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LocomotionBlendSpeed: 7
+--- !u!114 &7208286245447834234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2769977590197208216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3f88a007dd37c6469e721da3230edc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player
 --- !u!1 &2968872811667323076
 GameObject:
   m_ObjectHideFlags: 0
@@ -2510,7 +2543,7 @@ Transform:
   m_GameObject: {fileID: 5833988259217540054}
   serializedVersion: 2
   m_LocalRotation: {x: 0.000000014756143, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.083734095, z: -1.2357993}
+  m_LocalPosition: {x: 2.4, y: 0.48000622, z: -0.35819006}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
