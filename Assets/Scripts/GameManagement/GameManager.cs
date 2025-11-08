@@ -36,4 +36,11 @@ public class GameManager : MonoBehaviour
         Cursor.visible = false;
         isGameStatePaused = false;
     }
+
+    public void ResetPlayer()
+    {
+        Player player = Player.Instance;
+
+        player.IsDead = false;
+    }
 }

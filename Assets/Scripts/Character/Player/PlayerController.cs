@@ -77,6 +77,10 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if(GameManager.Instance.IsGameStatePaused)
+        {
+            return;
+        }
         UpdateMovementState();
         HandleVerticalMovement();
         HandleLateralMovement();
@@ -84,6 +88,10 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (GameManager.Instance.IsGameStatePaused)
+        {
+            return;
+        }
         UpdateCameraRotation();
     }
 

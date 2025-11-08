@@ -895,9 +895,37 @@ MonoBehaviour:
     m_ActionId: b9b5e855-469b-4f43-a375-5e96ca492285
     m_ActionName: 'Player/Interact[/Keyboard/e]'
   - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: e532f9db-fcea-417d-befb-216a58bd90b9
-    m_ActionName: 'Player/Primary[/Mouse/leftButton]'
+      m_Calls:
+      - m_Target: {fileID: 243870664006996617}
+        m_TargetAssemblyTypeName: InputManager, Assembly-CSharp
+        m_MethodName: PauseResumeEvent
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 1740be9b-c4df-48fd-b67e-1380e93040d9
+    m_ActionName: 'Player/Pause[/Keyboard/escape]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 243870664006996617}
+        m_TargetAssemblyTypeName: InputManager, Assembly-CSharp
+        m_MethodName: CharacterEvent
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 5f9161b0-22bc-42ed-97b7-ae44bf654f28
+    m_ActionName: 'Player/Character[/Keyboard/tab]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard
   m_DefaultActionMap: Player
@@ -2543,7 +2571,7 @@ Transform:
   m_GameObject: {fileID: 5833988259217540054}
   serializedVersion: 2
   m_LocalRotation: {x: 0.000000014756143, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.4, y: 0.48000622, z: -0.35819006}
+  m_LocalPosition: {x: 0, y: -0.083733946, z: -1.2357992}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

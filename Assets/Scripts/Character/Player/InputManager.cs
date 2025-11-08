@@ -74,4 +74,35 @@ public class InputManager : MonoBehaviour
             }
         }
     }
+
+    public void PauseResumeEvent(InputAction.CallbackContext context)
+    {
+        if (context.performed && !Player.Instance.IsDead && !PauseMenu.Instance.RebindingUI.activeSelf)
+        {
+            UIManager.Instance.ToogleMenu(MenuType.PAUSE);
+        }
+    }
+
+    public void CharacterEvent(InputAction.CallbackContext context)
+    {
+        if (context.performed && !Player.Instance.IsDead)
+        {
+            switch(UIManager.Instance.CurrentMenuType)
+            {
+                case MenuType.STATUS:
+                    UIManager.Instance.ToogleMenu(MenuType.STATUS);
+                    break;
+                case MenuType.ABILITIES:
+                    UIManager.Instance.ToogleMenu(MenuType.ABILITIES);
+                    break;
+                case MenuType.QUESTS:
+                    UIManager.Instance.ToogleMenu(MenuType.QUESTS);
+                    break;
+                case MenuType.NONE:
+                    UIManager.Instance.ToogleMenu(MenuType.STATUS);
+                    break;
+            }
+            
+        }
+    }
 }

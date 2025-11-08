@@ -61,9 +61,18 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Primary",
+                    "name": "Pause",
                     "type": "Button",
-                    "id": "e532f9db-fcea-417d-befb-216a58bd90b9",
+                    "id": "1740be9b-c4df-48fd-b67e-1380e93040d9",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Character",
+                    "type": "Button",
+                    "id": "5f9161b0-22bc-42ed-97b7-ae44bf654f28",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -249,23 +258,45 @@
                 },
                 {
                     "name": "",
-                    "id": "3abd44a3-7ff0-4ff4-a667-7b7faedebdec",
-                    "path": "<Mouse>/leftButton",
+                    "id": "ff1a9125-f8bc-48bf-b38d-5410173b6f1c",
+                    "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard",
-                    "action": "Primary",
+                    "action": "Pause",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "c3fbfb2a-276d-43e2-b35b-6d6d96d025c0",
-                    "path": "<Gamepad>/rightShoulder",
+                    "id": "68b1a213-1f94-402f-a290-e12e79a7261b",
+                    "path": "<Gamepad>/start",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "Primary",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a5b7eb97-add0-4a90-9f14-ec8ce7dc35b4",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "Character",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9e05394d-c198-4528-a687-f176d2c3cd89",
+                    "path": "<Gamepad>/select",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "Character",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
