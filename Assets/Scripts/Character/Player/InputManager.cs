@@ -102,7 +102,6 @@ public class InputManager : MonoBehaviour
                     UIManager.Instance.ToogleMenu(MenuType.STATUS);
                     break;
             }
-            
         }
     }
 }

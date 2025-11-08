@@ -749,6 +749,7 @@ GameObject:
   - component: {fileID: 3592454733622766765}
   - component: {fileID: 3316827085034135022}
   - component: {fileID: 7208286245447834234}
+  - component: {fileID: 5203806142132765926}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -1065,6 +1066,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f88a007dd37c6469e721da3230edc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
+--- !u!114 &5203806142132765926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2769977590197208216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efc403bb520453d4ea1c1e87bb019b27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
+  CharacterName: '***'
+  armor: 0
+  damage: 0
+  currentHealth: 0
+  maxHealth: 0
+  HealthChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  health:
+    baseValue: 20
+    ValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  strength:
+    baseValue: 10
+    ValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  agility:
+    baseValue: 10
+    ValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  magic:
+    baseValue: 10
+    ValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  MPChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2968872811667323076
 GameObject:
   m_ObjectHideFlags: 0

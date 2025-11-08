@@ -15,7 +15,10 @@ public class SetPlayerStartingPosition : MonoBehaviour
 
     private void Awake()
     {
-        TargetPlayerController = Player.Instance.GetComponent<PlayerController>();
+        if(Player.Instance)
+        {
+            TargetPlayerController = Player.Instance.GetComponent<PlayerController>();
+        }
 
         if (TargetPlayerController == null)
         {
