@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -24,6 +25,15 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject statusSelectObject;
     [SerializeField] private GameObject abilitiesSelectObject;
     [SerializeField] private GameObject questsSelectObject;
+
+    [Header("Stats")]
+    [SerializeField] private TMP_Text playerNameText;
+    [SerializeField] private TMP_Text HPText;
+    [SerializeField] private TMP_Text MPText;
+    [SerializeField] private TMP_Text strengthText;
+    [SerializeField] private TMP_Text agilityText;
+    [SerializeField] private TMP_Text healthText;
+    [SerializeField] private TMP_Text magicText;
 
     public static UIManager Instance { get; private set; }
     public MenuType CurrentMenuType { get => currentMenuType; set => currentMenuType = value; }
@@ -53,6 +63,18 @@ public class UIManager : MonoBehaviour
         {
             return;
         }
+
+        StatsSetup();
+    }
+
+    private void OnDisable()
+    {
+        if (Player.Instance == null)
+        {
+            return;
+        }
+
+        UnsubscribeStats();
     }
 
     public void ChangeSelectedElement(GameObject toSelect)
@@ -175,5 +197,59 @@ public class UIManager : MonoBehaviour
     {
         panelToOpen.SetActive(true);
         panelToClose.SetActive(false);
+    }
+
+    private void StatsSetup()
+    {
+        PlayerStats playerStats = Player.Instance.GetComponent<PlayerStats>();
+        playerStats.HealthChanged.AddListener(OnHealthChanged);
+        playerStats.StrengthChanged.AddListener(OnStrengthChanged);
+        playerStats.AgilityChanged.AddListener(OnAgilityChanged);
+        playerStats.MagicChanged.AddListener(OnMagicChanged);
+        playerStats.HPChanged.AddListener(OnHPChanged);
+        playerStats.MPChanged.AddListener(OnMPChanged);
+
+        playerStats.InvokeAllStats();
+    }
+
+    private void UnsubscribeStats()
+    {
+        PlayerStats playerStats = Player.Instance.GetComponent<PlayerStats>();
+        playerStats.HealthChanged.RemoveListener(OnHealthChanged);
+        playerStats.StrengthChanged.RemoveListener(OnStrengthChanged);
+        playerStats.AgilityChanged.RemoveListener(OnAgilityChanged);
+        playerStats.MagicChanged.RemoveListener(OnMagicChanged);
+        playerStats.HPChanged.RemoveListener(OnHPChanged);
+        playerStats.MPChanged.RemoveListener(OnMPChanged);
+    }
+
+    private void OnHealthChanged(int baseValue, int modifierValue)
+    {
+        healthText.text = modifierValue == 0 ? $"{baseValue}" : modifierValue < 0 ? $"{baseValue}({modifierValue})" : $"{baseValue}(+{modifierValue})";
+    }
+
+    private void OnStrengthChanged(int baseValue, int modifierValue)
+    {
+        strengthText.text = modifierValue == 0 ? $"{baseValue}" : modifierValue < 0 ? $"{baseValue}({modifierValue})" : $"{baseValue}(+{modifierValue})";
+    }
+
+    private void OnAgilityChanged(int baseValue, int modifierValue)
+    {
+        agilityText.text = modifierValue == 0 ? $"{baseValue}" : modifierValue < 0 ? $"{baseValue}({modifierValue})" : $"{baseValue}(+{modifierValue})";
+    }
+
+    private void OnMagicChanged(int baseValue, int modifierValue)
+    {
+        magicText.text = modifierValue == 0 ? $"{baseValue}" : modifierValue < 0 ? $"{baseValue}({modifierValue})" : $"{baseValue}(+{modifierValue})";
+    }
+
+    private void OnHPChanged(int current, int max)
+    {
+        HPText.text = $"HP: {current} / {max}";
+    }
+
+    private void OnMPChanged(int current, int max)
+    {
+        MPText.text = $"MP: {current} / {max}";
     }
 }

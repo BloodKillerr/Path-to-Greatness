@@ -19,12 +19,12 @@ public class CharacterStats : MonoBehaviour
     public int MaxHealth { get => maxHealth; set => maxHealth = value; }
     public bool IsInvincible { get => isInvincible; set => isInvincible = value; }
 
-    public UnityEvent<int, int> HealthChanged = new UnityEvent<int, int>();
+    public UnityEvent<int, int> HPChanged = new UnityEvent<int, int>();
 
     private void Awake()
     {
         currentHealth = maxHealth;
-        HealthChanged?.Invoke(currentHealth, maxHealth);
+        HPChanged?.Invoke(currentHealth, maxHealth);
     }
 
     public void TakeDamage(int damage)
@@ -39,7 +39,7 @@ public class CharacterStats : MonoBehaviour
 
         currentHealth = Mathf.Max(currentHealth - net, 0);
 
-        HealthChanged?.Invoke(currentHealth, maxHealth);
+        HPChanged?.Invoke(currentHealth, maxHealth);
 
         CheckHealth();
     }
@@ -47,7 +47,7 @@ public class CharacterStats : MonoBehaviour
     public void Heal(int amount)
     {
         currentHealth = Mathf.Min(currentHealth + amount, maxHealth);
-        HealthChanged?.Invoke(currentHealth, maxHealth);
+        HPChanged?.Invoke(currentHealth, maxHealth);
     }
 
     public void CheckHealth()

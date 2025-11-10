@@ -49,4 +49,13 @@ public class Stat
     {
         return baseValue;
     }
+
+    public int GetModifiersValue()
+    {
+        int finalValue = 0;
+
+        modifiers.ForEach(x => finalValue += x);
+
+        return finalValue;
+    }
 }

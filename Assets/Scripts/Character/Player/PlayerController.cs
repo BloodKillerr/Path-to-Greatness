@@ -245,7 +245,10 @@ public class PlayerController : MonoBehaviour
         newVelocity.y += verticalVelocity;
         newVelocity = !isGrounded ? HandleSteepWalls(newVelocity) : newVelocity;
 
-        characterController.Move(newVelocity * Time.deltaTime);
+        if(characterController.enabled)
+        {
+            characterController.Move(newVelocity * Time.deltaTime);
+        }
     }
 
     private void HandleVerticalMovement()

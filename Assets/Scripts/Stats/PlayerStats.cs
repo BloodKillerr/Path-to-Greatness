@@ -24,23 +24,67 @@ public class PlayerStats : CharacterStats
 
     public UnityEvent<int, int> MPChanged = new UnityEvent<int, int>();
 
+    public UnityEvent<int, int> HealthChanged = new UnityEvent<int, int> ();
+    public UnityEvent<int, int> StrengthChanged = new UnityEvent<int, int>();
+    public UnityEvent<int, int> AgilityChanged = new UnityEvent<int, int>();
+    public UnityEvent<int, int> MagicChanged = new UnityEvent<int, int>();
+
     private void Awake()
     {
-        MaxHealth = health.GetValue() * 10;
+        MaxHealth = 10 + (health.GetValue() * 10);
         CurrentHealth = MaxHealth;
-        HealthChanged?.Invoke(CurrentHealth, MaxHealth);
+        HPChanged?.Invoke(CurrentHealth, MaxHealth);
         Armor = agility.GetValue() / 2;
         Damage = (int)(strength.GetValue() * 1.5f);
-        maxMP = magic.GetValue() * 2;
+        maxMP = 10 + (magic.GetValue() * 2);
         currentMP = maxMP;
-        HealthChanged?.Invoke(CurrentHealth, MaxHealth);
+        HPChanged?.Invoke(CurrentHealth, MaxHealth);
         MPChanged?.Invoke(currentMP, MaxMP);
+        HealthChanged?.Invoke(health.GetBaseValue(), health.GetModifiersValue());
+        StrengthChanged?.Invoke(strength.GetBaseValue(), strength.GetModifiersValue());
+        AgilityChanged?.Invoke(agility.GetBaseValue(), agility.GetModifiersValue());
+        MagicChanged?.Invoke(magic.GetBaseValue(), magic.GetModifiersValue());
     }
 
     public void UpgradeHealth(int upgrade)
     {
         health.Upgrade(upgrade);
-        MaxHealth = health.GetValue() * 100;
+        MaxHealth = 10 + (health.GetValue() * 10);
         Heal(upgrade);
+    }
+
+    public void UpgradeStrength(int upgrade)
+    {
+        strength.Upgrade(upgrade);
+        Damage = (int)(strength.GetValue() * 1.5f);
+    }
+
+    public void UpgradeAgility(int upgrade)
+    {
+        agility.Upgrade(upgrade);
+        Armor = agility.GetValue() / 2;
+    }
+
+    public void UpgradeMagic(int upgrade)
+    {
+        magic.Upgrade(upgrade);
+        maxMP = 10 + (magic.GetValue() * 2);
+        RegainMP(upgrade);
+    }
+
+    public void RegainMP(int amount)
+    {
+        currentMP = Mathf.Min(currentMP + amount, MaxMP);
+        MPChanged?.Invoke(currentMP, maxMP);
+    }
+
+    public void InvokeAllStats()
+    {
+        HPChanged?.Invoke(CurrentHealth, MaxHealth);
+        MPChanged?.Invoke(currentMP, MaxMP);
+        HealthChanged?.Invoke(health.GetBaseValue(), health.GetModifiersValue());
+        StrengthChanged?.Invoke(strength.GetBaseValue(), strength.GetModifiersValue());
+        AgilityChanged?.Invoke(agility.GetBaseValue(), agility.GetModifiersValue());
+        MagicChanged?.Invoke(magic.GetBaseValue(), magic.GetModifiersValue());
     }
 }
