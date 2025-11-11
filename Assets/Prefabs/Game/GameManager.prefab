@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 2515593577643562261}
   - component: {fileID: 8964391178651412497}
   - component: {fileID: 8958553444487353350}
+  - component: {fileID: 9017835988333107492}
+  - component: {fileID: 7064528366429988106}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -57,3 +59,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb382e129b43d8341b02376029e8731b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
+  pausePanel: {fileID: 0}
+  statusPanel: {fileID: 0}
+  abilitiesPanel: {fileID: 0}
+  questsPanel: {fileID: 0}
+  statusSelectObject: {fileID: 0}
+  abilitiesSelectObject: {fileID: 0}
+  questsSelectObject: {fileID: 0}
+  playerNameText: {fileID: 0}
+  HPText: {fileID: 0}
+  MPText: {fileID: 0}
+  strengthText: {fileID: 0}
+  agilityText: {fileID: 0}
+  healthText: {fileID: 0}
+  magicText: {fileID: 0}
+--- !u!114 &9017835988333107492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7766940640006406333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61cbc8448cfc7a94ca0b85e739c3f7c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Supervisor
+  EventCaps:
+  - eventId: Arrow.Health
+    cap: 20
+  - eventId: Arrow.Agility
+    cap: 20
+  - eventId: Arrow.Strength
+    cap: 20
+  EventPools: []
+--- !u!114 &7064528366429988106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7766940640006406333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a80c7f898da85ce468c2724fe3048d5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EventBus

@@ -202,6 +202,9 @@ public class UIManager : MonoBehaviour
     private void StatsSetup()
     {
         PlayerStats playerStats = Player.Instance.GetComponent<PlayerStats>();
+
+        playerNameText.text = playerStats.CharacterName;
+
         playerStats.HealthChanged.AddListener(OnHealthChanged);
         playerStats.StrengthChanged.AddListener(OnStrengthChanged);
         playerStats.AgilityChanged.AddListener(OnAgilityChanged);

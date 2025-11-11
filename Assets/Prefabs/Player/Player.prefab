@@ -1078,12 +1078,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efc403bb520453d4ea1c1e87bb019b27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
-  CharacterName: '***'
+  characterName: ...
   armor: 0
   damage: 0
   currentHealth: 0
   maxHealth: 0
-  HealthChanged:
+  HPChanged:
     m_PersistentCalls:
       m_Calls: []
   health:
@@ -1106,7 +1106,21 @@ MonoBehaviour:
     ValueChanged:
       m_PersistentCalls:
         m_Calls: []
+  regenDelay: 5
+  regenInterval: 0.5
   MPChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  HealthChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  StrengthChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  AgilityChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  MagicChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &2968872811667323076

@@ -3,7 +3,7 @@ using UnityEngine.Events;
 
 public class CharacterStats : MonoBehaviour
 {
-    [SerializeField] private string CharacterName;
+    [SerializeField] private string characterName;
 
     [SerializeField] private int armor;
     [SerializeField] private int damage;
@@ -18,6 +18,7 @@ public class CharacterStats : MonoBehaviour
     public int CurrentHealth { get => currentHealth; set => currentHealth = value; }
     public int MaxHealth { get => maxHealth; set => maxHealth = value; }
     public bool IsInvincible { get => isInvincible; set => isInvincible = value; }
+    public string CharacterName { get => characterName; set => characterName = value; }
 
     public UnityEvent<int, int> HPChanged = new UnityEvent<int, int>();
 
@@ -27,7 +28,7 @@ public class CharacterStats : MonoBehaviour
         HPChanged?.Invoke(currentHealth, maxHealth);
     }
 
-    public void TakeDamage(int damage)
+    public virtual void TakeDamage(int damage)
     {
         if (isInvincible)
         {

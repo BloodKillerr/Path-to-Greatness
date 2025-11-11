@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -15,12 +16,43 @@ public class PlayerStats : CharacterStats
 
     private int maxMP;
 
+    [SerializeField] private float regenDelay = 5f;
+    [SerializeField] private float regenInterval = .5f;
+
+    private float lastDamageTime;
+    private float lastMPUseTime;
+
     public Stat Agility { get => agility; set => agility = value; }
     public Stat Magic { get => magic; set => magic = value; }
     public Stat Health { get => health; set => health = value; }
     public Stat Strength { get => strength; set => strength = value; }
-    public int CurrentMP { get => currentMP; set => currentMP = value; }
-    public int MaxMP { get => maxMP; set => maxMP = value; }
+    public int CurrentMP
+    {
+        get => currentMP;
+        set
+        {
+            if (value < currentMP)
+            {
+                lastMPUseTime = Time.time;
+                CancelMPRegenStart();
+                CancelInvoke(nameof(MPRegenTick));
+                ScheduleMPRegen();
+            }
+
+            currentMP = Mathf.Clamp(value, 0, MaxMP);
+            MPChanged?.Invoke(currentMP, MaxMP);
+        }
+    }
+    public int MaxMP
+    {
+        get => maxMP;
+        set
+        {
+            maxMP = value;
+            currentMP = Mathf.Min(currentMP, maxMP);
+            MPChanged?.Invoke(currentMP, MaxMP);
+        }
+    }
 
     public UnityEvent<int, int> MPChanged = new UnityEvent<int, int>();
 
@@ -34,42 +66,100 @@ public class PlayerStats : CharacterStats
         MaxHealth = 10 + (health.GetValue() * 10);
         CurrentHealth = MaxHealth;
         HPChanged?.Invoke(CurrentHealth, MaxHealth);
+
         Armor = agility.GetValue() / 2;
         Damage = (int)(strength.GetValue() * 1.5f);
+
         maxMP = 10 + (magic.GetValue() * 2);
         currentMP = maxMP;
+
         HPChanged?.Invoke(CurrentHealth, MaxHealth);
         MPChanged?.Invoke(currentMP, MaxMP);
+
         HealthChanged?.Invoke(health.GetBaseValue(), health.GetModifiersValue());
         StrengthChanged?.Invoke(strength.GetBaseValue(), strength.GetModifiersValue());
         AgilityChanged?.Invoke(agility.GetBaseValue(), agility.GetModifiersValue());
         MagicChanged?.Invoke(magic.GetBaseValue(), magic.GetModifiersValue());
+
+        lastDamageTime = Time.time;
+        lastMPUseTime = Time.time;
+
+        ScheduleHPRegen();
+        ScheduleMPRegen();
+    }
+
+    public override void TakeDamage(int damage)
+    {
+        lastDamageTime = Time.time;
+
+        CancelHPRegenStart();
+        CancelInvoke(nameof(HPRegenTick));
+
+        base.TakeDamage(damage);
+
+        ScheduleHPRegen();
+    }
+
+    public bool UseMP(int amount)
+    {
+        if (amount <= 0)
+        {
+            return true;
+        }
+        if (currentMP >= amount)
+        {
+            currentMP -= amount;
+            lastMPUseTime = Time.time;
+
+            CancelMPRegenStart();
+            CancelInvoke(nameof(MPRegenTick));
+            MPChanged?.Invoke(currentMP, MaxMP);
+            ScheduleMPRegen();
+            return true;
+        }
+        return false;
     }
 
     public void UpgradeHealth(int upgrade)
     {
         health.Upgrade(upgrade);
+        int oldMax = MaxHealth;
         MaxHealth = 10 + (health.GetValue() * 10);
-        Heal(upgrade);
+
+        CurrentHealth = Mathf.Min(CurrentHealth, MaxHealth);
+        HPChanged?.Invoke(CurrentHealth, MaxHealth);
+
+        CancelHPRegenStart();
+        CancelInvoke(nameof(HPRegenTick));
+        ScheduleHPRegen();
+        HealthChanged?.Invoke(health.GetBaseValue(), health.GetModifiersValue());
     }
 
     public void UpgradeStrength(int upgrade)
     {
         strength.Upgrade(upgrade);
         Damage = (int)(strength.GetValue() * 1.5f);
+        StrengthChanged?.Invoke(strength.GetBaseValue(), strength.GetModifiersValue());
     }
 
     public void UpgradeAgility(int upgrade)
     {
         agility.Upgrade(upgrade);
         Armor = agility.GetValue() / 2;
+        AgilityChanged?.Invoke(agility.GetBaseValue(), agility.GetModifiersValue());
     }
 
     public void UpgradeMagic(int upgrade)
     {
         magic.Upgrade(upgrade);
-        maxMP = 10 + (magic.GetValue() * 2);
-        RegainMP(upgrade);
+        int oldMax = MaxMP;
+        MaxMP = 10 + (magic.GetValue() * 2);
+
+        MPChanged?.Invoke(currentMP, MaxMP);
+        CancelMPRegenStart();
+        CancelInvoke(nameof(MPRegenTick));
+        ScheduleMPRegen();
+        MagicChanged?.Invoke(magic.GetBaseValue(), magic.GetModifiersValue());
     }
 
     public void RegainMP(int amount)
@@ -86,5 +176,73 @@ public class PlayerStats : CharacterStats
         StrengthChanged?.Invoke(strength.GetBaseValue(), strength.GetModifiersValue());
         AgilityChanged?.Invoke(agility.GetBaseValue(), agility.GetModifiersValue());
         MagicChanged?.Invoke(magic.GetBaseValue(), magic.GetModifiersValue());
+    }
+
+    private void ScheduleHPRegen()
+    {
+        CancelHPRegenStart();
+
+        if (CurrentHealth < MaxHealth)
+        {
+            Invoke(nameof(StartHPRegenRepeating), regenDelay);
+        }
+    }
+
+    private void CancelHPRegenStart()
+    {
+        CancelInvoke(nameof(StartHPRegenRepeating));
+    }
+
+    private void StartHPRegenRepeating()
+    {
+        if (CurrentHealth < MaxHealth)
+        {
+            InvokeRepeating(nameof(HPRegenTick), 0f, regenInterval);
+        }
+    }
+
+    private void HPRegenTick()
+    {
+        if (CurrentHealth >= MaxHealth)
+        {
+            CancelInvoke(nameof(HPRegenTick));
+            return;
+        }
+
+        Heal(1);
+    }
+
+    private void ScheduleMPRegen()
+    {
+        CancelMPRegenStart();
+
+        if (currentMP < MaxMP)
+        {
+            Invoke(nameof(StartMPRegenRepeating), regenDelay);
+        }
+    }
+
+    private void CancelMPRegenStart()
+    {
+        CancelInvoke(nameof(StartMPRegenRepeating));
+    }
+
+    private void StartMPRegenRepeating()
+    {
+        if (currentMP < MaxMP)
+        {
+            InvokeRepeating(nameof(MPRegenTick), 0f, regenInterval);
+        }
+    }
+
+    private void MPRegenTick()
+    {
+        if (currentMP >= MaxMP)
+        {
+            CancelInvoke(nameof(MPRegenTick));
+            return;
+        }
+
+        RegainMP(1);
     }
 }
