@@ -63,6 +63,8 @@ public class PlayerController : MonoBehaviour
     public float RotationMismatch { get => rotationMismatch; set => rotationMismatch = value; }
     public bool IsRotatingToTarget { get => isRotatingToTarget; set => isRotatingToTarget = value; }
     public bool WalkInput { get => walkInput; set => walkInput = value; }
+    public CharacterController CharacterController { get => characterController; set => characterController = value; }
+    public PlayerState PlayerState { get => playerState; set => playerState = value; }
 
     private void Awake()
     {

@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 725d7cd577d264444a0f27a2f6035536, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PersistBetweenScenes
-  allowedScenes: 0100000002000000
+  allowedScenes: 01000000020000000300000004000000
 --- !u!1001 &304744805094201832
 PrefabInstance:
   m_ObjectHideFlags: 0
