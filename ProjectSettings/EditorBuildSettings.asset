@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/F3.unity
     guid: 20a1f25f942e79040890c370889986ca
+  - enabled: 1
+    path: Assets/Scenes/F4.unity
+    guid: 029fe374b1583dd418e783a166585a04
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 4bbf33a65af868748a3ac43182089428, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

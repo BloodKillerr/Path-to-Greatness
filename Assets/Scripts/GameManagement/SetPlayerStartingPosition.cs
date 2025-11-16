@@ -56,6 +56,7 @@ public class SetPlayerStartingPosition : MonoBehaviour
         yield return null;
         if (cc != null)
         {
+            cc.stepOffset = 0.3f;
             cc.enabled = true;
         } 
     }
