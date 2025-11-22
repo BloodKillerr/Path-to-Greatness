@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 725d7cd577d264444a0f27a2f6035536, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PersistBetweenScenes
-  allowedScenes: 0100000002000000030000000400000005000000
+  allowedScenes: 010000000200000003000000040000000500000006000000
 --- !u!1001 &304744805094201832
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -177,6 +177,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 5624822738521271056}
     - target: {fileID: 8958553444487353350, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
+      propertyPath: questText
+      value: 
+      objectReference: {fileID: 2694241095374649942}
+    - target: {fileID: 8958553444487353350, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
       propertyPath: healthText
       value: 
       objectReference: {fileID: 435531717775091591}
@@ -197,6 +201,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4143150728987199117}
     - target: {fileID: 8958553444487353350, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
+      propertyPath: questsHolder
+      value: 
+      objectReference: {fileID: 8361458901720320194}
+    - target: {fileID: 8958553444487353350, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
       propertyPath: strengthText
       value: 
       objectReference: {fileID: 1988683214591384610}
@@ -216,6 +224,10 @@ PrefabInstance:
       propertyPath: statusSelectObject
       value: 
       objectReference: {fileID: 8473419524965217978}
+    - target: {fileID: 8958553444487353350, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
+      propertyPath: passiveAbilityHolder
+      value: 
+      objectReference: {fileID: 4339006123941100821}
     - target: {fileID: 8958553444487353350, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
       propertyPath: abilitiesSelectObject
       value: 
@@ -640,6 +652,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &2694241095374649942 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5204394997586648641, guid: ce46d5b0f7a16a74fa3b4623dbbfa367, type: 3}
+  m_PrefabInstance: {fileID: 7879724492793603095}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &3127444549394990812 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5061075739823301323, guid: ce46d5b0f7a16a74fa3b4623dbbfa367, type: 3}
@@ -677,6 +700,11 @@ CanvasGroup:
   m_CorrespondingSourceObject: {fileID: 6063263535092638362, guid: ce46d5b0f7a16a74fa3b4623dbbfa367, type: 3}
   m_PrefabInstance: {fileID: 7879724492793603095}
   m_PrefabAsset: {fileID: 0}
+--- !u!224 &4339006123941100821 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5867443444869798146, guid: ce46d5b0f7a16a74fa3b4623dbbfa367, type: 3}
+  m_PrefabInstance: {fileID: 7879724492793603095}
+  m_PrefabAsset: {fileID: 0}
 --- !u!225 &5190478077526963304 stripped
 CanvasGroup:
   m_CorrespondingSourceObject: {fileID: 2689264578719256703, guid: ce46d5b0f7a16a74fa3b4623dbbfa367, type: 3}
@@ -707,6 +735,11 @@ MonoBehaviour:
 --- !u!224 &7606980705031967329 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 345381928234792566, guid: ce46d5b0f7a16a74fa3b4623dbbfa367, type: 3}
+  m_PrefabInstance: {fileID: 7879724492793603095}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &8361458901720320194 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 1825005943544949973, guid: ce46d5b0f7a16a74fa3b4623dbbfa367, type: 3}
   m_PrefabInstance: {fileID: 7879724492793603095}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &8473419524965217978 stripped

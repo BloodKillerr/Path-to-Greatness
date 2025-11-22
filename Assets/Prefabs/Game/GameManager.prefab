@@ -13,6 +13,9 @@ GameObject:
   - component: {fileID: 8958553444487353350}
   - component: {fileID: 9017835988333107492}
   - component: {fileID: 7064528366429988106}
+  - component: {fileID: 4599317681303721506}
+  - component: {fileID: 2200900054458749618}
+  - component: {fileID: 7640886292687551011}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -73,6 +76,11 @@ MonoBehaviour:
   agilityText: {fileID: 0}
   healthText: {fileID: 0}
   magicText: {fileID: 0}
+  passiveAbilityHolder: {fileID: 0}
+  passiveAbilityPrefab: {fileID: 312568877314772352, guid: 4f53142de3a4e5e48a71d49dcdad8508, type: 3}
+  questsHolder: {fileID: 0}
+  questBlockPrefab: {fileID: 304078710177838271, guid: 6e46988ac80f5f84b988a43fe0563b42, type: 3}
+  questText: {fileID: 0}
 --- !u!114 &9017835988333107492
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93,6 +101,14 @@ MonoBehaviour:
   - eventId: Arrow.Strength
     cap: 20
   EventPools: []
+  statAbilityBundles:
+  - id: 0
+    healthThreshold: 5
+    strengthThreshold: 5
+    agilityThreshold: 5
+    magicThreshold: 0
+    abilityName: Sturdy Physique
+    singleGrantPerPlayer: 1
 --- !u!114 &7064528366429988106
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -105,3 +121,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a80c7f898da85ce468c2724fe3048d5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventBus
+--- !u!114 &4599317681303721506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7766940640006406333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7693b1591703fe54e8e54e7851cea572, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilityManager
+  OnPlayerAttack:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &2200900054458749618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7766940640006406333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eab29da4ee41d6c42b85c3e5e7da1299, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilityDatabase
+--- !u!114 &7640886292687551011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7766940640006406333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e47c9c0c92eb08a42b2525a8955a8977, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuestManager

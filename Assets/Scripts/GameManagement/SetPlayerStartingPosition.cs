@@ -15,11 +15,16 @@ public class SetPlayerStartingPosition : MonoBehaviour
 
     private void Awake()
     {
-        if(Player.Instance)
+        if (Player.Instance)
         {
             TargetPlayerController = Player.Instance.GetComponent<PlayerController>();
         }
 
+        TriggerTeleportation();
+    }
+
+    public void TriggerTeleportation()
+    {
         if (TargetPlayerController == null)
         {
             return;

@@ -17,10 +17,13 @@ public class UIManager : MonoBehaviour
 {
     private MenuType currentMenuType = MenuType.NONE;
 
+    [Header("Panels")]
     [SerializeField] private CanvasGroup pausePanel;
     [SerializeField] private CanvasGroup statusPanel;
     [SerializeField] private CanvasGroup abilitiesPanel;
     [SerializeField] private CanvasGroup questsPanel;
+
+    [Header("Select Objects")]
 
     [SerializeField] private GameObject statusSelectObject;
     [SerializeField] private GameObject abilitiesSelectObject;
@@ -34,6 +37,15 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text agilityText;
     [SerializeField] private TMP_Text healthText;
     [SerializeField] private TMP_Text magicText;
+
+    [Header("Abilities")]
+    [SerializeField] private Transform passiveAbilityHolder;
+    [SerializeField] private GameObject passiveAbilityPrefab;
+
+    [Header("Quests")]
+    [SerializeField] private Transform questsHolder;
+    [SerializeField] private GameObject questBlockPrefab;
+    [SerializeField] private TMP_Text questText;
 
     public static UIManager Instance { get; private set; }
     public MenuType CurrentMenuType { get => currentMenuType; set => currentMenuType = value; }
@@ -128,6 +140,7 @@ public class UIManager : MonoBehaviour
                     statusPanel.blocksRaycasts = true;
                     statusPanel.interactable = true;
                     ChangeSelectedElement(statusSelectObject);
+                    UpdateAbilitiesUI();
                 }
                 break;
             case MenuType.ABILITIES:
@@ -137,6 +150,7 @@ public class UIManager : MonoBehaviour
                     abilitiesPanel.blocksRaycasts = true;
                     abilitiesPanel.interactable = true;
                     ChangeSelectedElement(abilitiesSelectObject);
+                    UpdateAbilitiesUI();
                 }
                 break;
             case MenuType.QUESTS:
@@ -146,6 +160,8 @@ public class UIManager : MonoBehaviour
                     questsPanel.blocksRaycasts = true;
                     questsPanel.interactable = true;
                     ChangeSelectedElement(questsSelectObject);
+                    UpdateQuestsUI();
+                    ClearQuestView();
                 }
                 break;
         }
@@ -254,5 +270,95 @@ public class UIManager : MonoBehaviour
     private void OnMPChanged(int current, int max)
     {
         MPText.text = $"MP: {current} / {max}";
+    }
+
+    public void UpdateAbilitiesUI()
+    {
+        if (passiveAbilityHolder == null)
+        {
+            return;
+        }
+
+        foreach (Transform child in passiveAbilityHolder)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (Ability ability in AbilityManager.Instance.CurrentAbilities)
+        {
+            GameObject go = Instantiate(passiveAbilityPrefab, passiveAbilityHolder);
+            TMP_Text text = go.GetComponent<TMP_Text>();
+            text.text = ability.AbilityName;
+        }
+    }
+
+    public void UpdateQuestsUI()
+    {
+        if(questsHolder == null)
+        {
+            return;
+        }
+
+        foreach (Transform child in questsHolder)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (QuestInstance quest in QuestManager.Instance.GetActiveQuests(Player.Instance.gameObject))
+        {
+            GameObject go = Instantiate(questBlockPrefab, questsHolder);
+            QuestBlock block = go.GetComponent<QuestBlock>();
+            block.InitQuestBlock(quest);
+        }
+    }
+
+    public void UpdateQuestsView(QuestInstance questInstance)
+    {
+        QuestSO quest = questInstance.quest;
+        questText.text = string.Format("{0}\n\n{1}\n\nRequirements:\n{2}\n\nRewards:\n{3}", quest.title, quest.description, GetQuestRequirements(questInstance), GetRewardDisplay(quest));
+    }
+
+    public void ClearQuestView()
+    {
+        questText.text = "";
+    }
+
+    private string GetRewardDisplay(QuestSO quest)
+    {
+        if (quest.rewardType == QuestRewardType.StatUpgrade)
+        {
+            return $"+{quest.rewardAmount} {quest.rewardStat}";
+        }
+
+        if (quest.rewardType == QuestRewardType.AbilityGrant)
+        {
+            return $"Ability: {quest.rewardAbilityName}";
+        }
+
+        return "Reward";
+    }
+
+    private string GetQuestRequirements(QuestInstance questInstance)
+    {
+        QuestSO quest = questInstance.quest;
+        string requirements = "";
+
+        foreach(QuestRequirement requirement in quest.requirements)
+        {
+            int prog = questInstance.GetProgress(requirement.eventId);
+            requirements += $"{prog}/{requirement.requiredAmount} — {HumanizeEventId(requirement.eventId)}\n";
+        }
+
+        return requirements;
+    }
+
+    private string HumanizeEventId(string eventId)
+    {
+        if (string.IsNullOrEmpty(eventId))
+        {
+            return "";
+        }
+
+        return eventId.Replace('.', ' ').Replace('_', ' ');
     }
 }

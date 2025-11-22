@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using static StatUpgradeEffectSO;
@@ -19,6 +17,21 @@ public class EventToPool
     public RewardPoolSO pool;
 }
 
+[System.Serializable]
+public class StatAbilityBundle
+{
+    public string id;
+
+    public int healthThreshold = 20;
+    public int strengthThreshold = 20;
+    public int agilityThreshold = 20;
+    public int magicThreshold = 0;
+
+    public string abilityName;
+
+    public bool singleGrantPerPlayer = true;
+}
+
 public class Supervisor : MonoBehaviour
 {
     public List<EventCap> EventCaps = new List<EventCap>()
@@ -32,7 +45,17 @@ public class Supervisor : MonoBehaviour
 
     private readonly Dictionary<GameObject, Dictionary<string, int>> eventCounts = new();
 
+    public List<StatAbilityBundle> statAbilityBundles = new List<StatAbilityBundle>();
+
+    private readonly Dictionary<GameObject, Dictionary<StatType, int>> perPlayerStatGains = new();
+
+    private readonly Dictionary<GameObject, HashSet<string>> perPlayerGrantedAbilityIds = new();
+
     private UnityAction<SupervisorEvent> _statUpgradeHandler;
+
+    private UnityAction<SupervisorEvent> _statGainedHandler;
+
+    private UnityAction<SupervisorEvent> _grantAbilityHandler;
 
     public static Supervisor Instance { get; private set; }
 
@@ -49,12 +72,20 @@ public class Supervisor : MonoBehaviour
 
         _statUpgradeHandler = HandleStatUpgradeRequest;
 
-        if(EventBus.Instance == null)
+        _statGainedHandler = HandleStatGained;
+
+        _grantAbilityHandler = HandleGrantAbilityRequest;
+
+        if (EventBus.Instance == null)
         {
             return;
         }
 
+        EventBus.Instance.Subscribe("Supervisor.StatGained", _statGainedHandler);
+
         EventBus.Instance.Subscribe("Supervisor.StatUpgradeRequest", _statUpgradeHandler);
+
+        EventBus.Instance.Subscribe("Supervisor.GrantAbilityRequest", _grantAbilityHandler);
     }
 
     private void OnDestroy()
@@ -62,6 +93,8 @@ public class Supervisor : MonoBehaviour
         if (EventBus.Instance != null && _statUpgradeHandler != null)
         {
             EventBus.Instance.Unsubscribe("Supervisor.StatUpgradeRequest", _statUpgradeHandler);
+            EventBus.Instance.Unsubscribe("Supervisor.StatGained", _statGainedHandler);
+            EventBus.Instance.Unsubscribe("Supervisor.GrantAbilityRequest", _grantAbilityHandler);
         }
             
     }
@@ -132,7 +165,6 @@ public class Supervisor : MonoBehaviour
         return null;
     }
 
-    #region Handlers
     private void HandleStatUpgradeRequest(SupervisorEvent ev)
     {
         GameObject player = ev.Get<GameObject>("target", null);
@@ -248,7 +280,84 @@ public class Supervisor : MonoBehaviour
             EventBus.Instance.Publish(new SupervisorEvent("Supervisor.RewardPartiallyApplied", gameObject, partialData));
         }
     }
-    #endregion
+
+    private void HandleStatGained(SupervisorEvent ev)
+    {
+        GameObject player = ev.Get<GameObject>("target", null);
+        StatType stat = ev.Get<StatType>("stat", StatType.Strength);
+        int amount = ev.Get<int>("amount", 0);
+
+        if (player == null || amount <= 0)
+        {
+            return;
+        }
+
+        AddStatGain(player, stat, amount);
+        foreach (StatAbilityBundle bundle in statAbilityBundles)
+        {
+            if (bundle == null || string.IsNullOrEmpty(bundle.abilityName))
+            {
+                continue;
+            }
+
+            if (bundle.singleGrantPerPlayer && HasPlayerBeenGranted(player, bundle.id))
+            {
+                continue;
+            }
+
+            int h = GetAccumulatedStatGain(player, StatType.Health);
+            int s = GetAccumulatedStatGain(player, StatType.Strength);
+            int a = GetAccumulatedStatGain(player, StatType.Agility);
+            int m = GetAccumulatedStatGain(player, StatType.Magic);
+
+            if (h >= bundle.healthThreshold && s >= bundle.strengthThreshold && a >= bundle.agilityThreshold && m >= bundle.magicThreshold)
+            {
+                GrantAbilityToPlayer(player, bundle);
+            }
+        }
+    }
+
+    private void HandleGrantAbilityRequest(SupervisorEvent ev)
+    {
+        GameObject player = ev.Get<GameObject>("target", null);
+        string abilityName = ev.Get<string>("abilityName", null);
+        string bundleId = ev.Get<string>("bundleId", null);
+        bool singleGrant = ev.Get<bool>("singleGrant", true);
+
+        if (player == null || string.IsNullOrEmpty(abilityName))
+        {
+            Debug.LogWarning("[Supervisor] GrantAbilityRequest missing target or abilityName");
+            return;
+        }
+
+        string idToMark = string.IsNullOrEmpty(bundleId) ? abilityName : bundleId;
+        if (singleGrant && HasPlayerBeenGranted(player, idToMark))
+        {
+            Debug.Log($"[Supervisor] Player already granted '{idToMark}'. Skipping.");
+            return;
+        }
+
+        Ability abilityPrefab = AbilityDatabase.Instance?.GetByName(abilityName);
+        if (abilityPrefab == null)
+        {
+            Debug.LogWarning($"[Supervisor] GrantAbilityRequest: ability '{abilityName}' not found.");
+            return;
+        }
+
+        AbilityManager.Instance?.AddAbility(abilityPrefab);
+        if (singleGrant)
+        {
+            MarkPlayerGranted(player, idToMark);
+        }
+
+        var data = new Dictionary<string, object>()
+        {
+            { "target", player },
+            { "abilityName", abilityName },
+            { "bundleId", idToMark }
+        };
+        EventBus.Instance.Publish(new SupervisorEvent("Supervisor.AbilityGranted", gameObject, data));
+    }
 
     public int GetRemainingForPlayerEvent(GameObject player, string eventId)
     {
@@ -275,6 +384,123 @@ public class Supervisor : MonoBehaviour
         if (!found)
         {
             EventCaps.Add(new EventCap { eventId = eventId, cap = newCap });
+        }
+    }
+
+    public int GetAccumulatedStatGain(GameObject player, StatType stat)
+    {
+        if (player == null)
+        {
+            return 0;
+        }
+
+        if (!perPlayerStatGains.TryGetValue(player, out var map))
+        {
+            return 0;
+        }
+
+        if (!map.TryGetValue(stat, out var val))
+        {
+            return 0;
+        }
+
+        return val;
+    }
+
+    private void AddStatGain(GameObject player, StatType stat, int amount)
+    {
+        if (player == null || amount == 0)
+        {
+            return;
+        }
+
+        if (!perPlayerStatGains.TryGetValue(player, out var map))
+        {
+            map = new Dictionary<StatType, int>();
+            perPlayerStatGains[player] = map;
+        }
+
+        if (!map.TryGetValue(stat, out var current))
+        {
+            current = 0;
+        }
+
+        map[stat] = current + amount;
+    }
+
+    private bool HasPlayerBeenGranted(GameObject player, string bundleId)
+    {
+        if (player == null)
+        {
+            return false;
+        }
+
+        if (!perPlayerGrantedAbilityIds.TryGetValue(player, out var set))
+        {
+            return false;
+        }
+
+        return set.Contains(bundleId);
+    }
+
+    private void MarkPlayerGranted(GameObject player, string bundleId)
+    {
+        if (player == null)
+        {
+            return;
+        }
+
+        if (!perPlayerGrantedAbilityIds.TryGetValue(player, out var set))
+        {
+            set = new HashSet<string>();
+            perPlayerGrantedAbilityIds[player] = set;
+        }
+        set.Add(bundleId);
+    }
+
+    private void GrantAbilityToPlayer(GameObject player, StatAbilityBundle bundle)
+    {
+        if (player == null || bundle == null)
+        {
+            return;
+        }
+
+        Ability abilityPrefab = AbilityDatabase.Instance?.GetByName(bundle.abilityName);
+        if (abilityPrefab == null)
+        {
+            Debug.LogWarning($"[Supervisor] Unable to find ability '{bundle.abilityName}' to grant for bundle '{bundle.id}'.");
+            return;
+        }
+        AbilityManager.Instance?.AddAbility(abilityPrefab);
+        if (bundle.singleGrantPerPlayer)
+        {
+            MarkPlayerGranted(player, bundle.id);
+        }
+
+        Debug.Log($"[Supervisor] Granted ability '{bundle.abilityName}' to {player.name} (bundle {bundle.id}).");
+        var data = new Dictionary<string, object>()
+        {
+            { "target", player },
+            { "bundleId", bundle.id },
+            { "abilityName", bundle.abilityName }
+        };
+        EventBus.Instance.Publish(new SupervisorEvent("Supervisor.AbilityGranted", gameObject, data));
+    }
+    public void ResetAccumulatedGainsForPlayer(GameObject player)
+    {
+        if (player == null)
+        {
+            return;
+        }
+
+        if (perPlayerStatGains.ContainsKey(player))
+        {
+            perPlayerStatGains[player].Clear();
+        }
+
+        if (perPlayerGrantedAbilityIds.ContainsKey(player))
+        {
+            perPlayerGrantedAbilityIds[player].Clear();
         }
     }
 }

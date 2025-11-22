@@ -135,9 +135,47 @@ public class PlayerStats : CharacterStats
         HealthChanged?.Invoke(health.GetBaseValue(), health.GetModifiersValue());
     }
 
+    public void ModifyHealth(int modifier, bool remove)
+    {
+        if(remove)
+        {
+            health.RemoveModifier(modifier);
+        }
+        else if(modifier != 0)
+        {
+            health.AddModifier(modifier);
+        }
+
+        int oldMax = MaxHealth;
+        MaxHealth = 10 + (health.GetValue() * 10);
+
+        CurrentHealth = Mathf.Min(CurrentHealth, MaxHealth);
+        HPChanged?.Invoke(CurrentHealth, MaxHealth);
+
+        CancelHPRegenStart();
+        CancelInvoke(nameof(HPRegenTick));
+        ScheduleHPRegen();
+        HealthChanged?.Invoke(health.GetBaseValue(), health.GetModifiersValue());
+    }
+
     public void UpgradeStrength(int upgrade)
     {
         strength.Upgrade(upgrade);
+        Damage = (int)(strength.GetValue() * 1.5f);
+        StrengthChanged?.Invoke(strength.GetBaseValue(), strength.GetModifiersValue());
+    }
+
+    public void ModifyStrength(int modifier, bool remove)
+    {
+        if (remove)
+        {
+            strength.RemoveModifier(modifier);
+        }
+        else if (modifier != 0)
+        {
+            strength.AddModifier(modifier);
+        }
+
         Damage = (int)(strength.GetValue() * 1.5f);
         StrengthChanged?.Invoke(strength.GetBaseValue(), strength.GetModifiersValue());
     }
@@ -149,9 +187,45 @@ public class PlayerStats : CharacterStats
         AgilityChanged?.Invoke(agility.GetBaseValue(), agility.GetModifiersValue());
     }
 
+    public void ModifyAgility(int modifier, bool remove)
+    {
+        if (remove)
+        {
+            agility.RemoveModifier(modifier);
+        }
+        else if (modifier != 0)
+        {
+            agility.AddModifier(modifier);
+        }
+
+        Armor = agility.GetValue() / 2;
+        AgilityChanged?.Invoke(agility.GetBaseValue(), agility.GetModifiersValue());
+    }
+
     public void UpgradeMagic(int upgrade)
     {
         magic.Upgrade(upgrade);
+        int oldMax = MaxMP;
+        MaxMP = 10 + (magic.GetValue() * 2);
+
+        MPChanged?.Invoke(currentMP, MaxMP);
+        CancelMPRegenStart();
+        CancelInvoke(nameof(MPRegenTick));
+        ScheduleMPRegen();
+        MagicChanged?.Invoke(magic.GetBaseValue(), magic.GetModifiersValue());
+    }
+
+    public void ModifyMagic(int modifier, bool remove)
+    {
+        if (remove)
+        {
+            magic.RemoveModifier(modifier);
+        }
+        else if (modifier != 0)
+        {
+            magic.AddModifier(modifier);
+        }
+
         int oldMax = MaxMP;
         MaxMP = 10 + (magic.GetValue() * 2);
 

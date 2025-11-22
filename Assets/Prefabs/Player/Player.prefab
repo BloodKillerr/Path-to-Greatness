@@ -747,6 +747,7 @@ GameObject:
   - component: {fileID: 3193323232851524438}
   - component: {fileID: 8378639673409773528}
   - component: {fileID: 3592454733622766765}
+  - component: {fileID: 618633193639896024}
   - component: {fileID: 3316827085034135022}
   - component: {fileID: 7208286245447834234}
   - component: {fileID: 5203806142132765926}
@@ -996,8 +997,8 @@ MonoBehaviour:
   Gravity: 15
   TerminalVelocity: 50
   JumpSpeed: 0.8
-  LookSensitivityHorizontal: 2
-  LookSensitivityVertical: 2
+  LookSensitivityHorizontal: 3
+  LookSensitivityVertical: 3
   PositiveLookLimitVertical: 30
   NegativeLookLimitVertical: -20
   PlayerCamera: {fileID: 4083378476848003488}
@@ -1041,6 +1042,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CurrentPlayerMovementState: 0
+--- !u!114 &618633193639896024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2769977590197208216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1030c2edc7cbaf643a719a2a08d37bf4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatChangeReporter
 --- !u!114 &3316827085034135022
 MonoBehaviour:
   m_ObjectHideFlags: 0
