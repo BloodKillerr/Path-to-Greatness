@@ -188,6 +188,7 @@ GameObject:
   - component: {fileID: 2318864852297905963}
   - component: {fileID: 6506645897985266858}
   - component: {fileID: 1954882268087613185}
+  - component: {fileID: 7228292610999586414}
   m_Layer: 0
   m_Name: DungeonDoor
   m_TagString: Untagged
@@ -203,7 +204,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6136012121816597108}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_ConstrainProportionsScale: 0
@@ -211,7 +212,7 @@ Transform:
   - {fileID: 1833596521633636856}
   - {fileID: 432165646906345459}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6506645897985266858
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -247,6 +248,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 10, y: 20, z: 10}
   m_Center: {x: 0, y: 8, z: -5}
+--- !u!208 &7228292610999586414
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6136012121816597108}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 7.5, y: 0.5, z: 3}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &8459802605371273311
 GameObject:
   m_ObjectHideFlags: 0

@@ -198,6 +198,7 @@ MonoBehaviour:
   executeOnStart: 1
   clearPrevious: 1
   useRendererBoundsForRadius: 1
+  nextSceneIndex: 6
 --- !u!1 &481953760
 GameObject:
   m_ObjectHideFlags: 0
@@ -359,18 +360,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5259069281394290927, guid: d0e1a8481dd66d042869ef4b8327a577, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5259069281394290927, guid: d0e1a8481dd66d042869ef4b8327a577, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.083734095
-      objectReference: {fileID: 0}
-    - target: {fileID: 5259069281394290927, guid: d0e1a8481dd66d042869ef4b8327a577, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -1.2357993
-      objectReference: {fileID: 0}
     - target: {fileID: 5905631371635821852, guid: d0e1a8481dd66d042869ef4b8327a577, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -443,11 +432,88 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8361458901720320194, guid: d0e1a8481dd66d042869ef4b8327a577, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8909585158387435754, guid: d0e1a8481dd66d042869ef4b8327a577, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d0e1a8481dd66d042869ef4b8327a577, type: 3}
+--- !u!1 &1968382405
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1968382407}
+  - component: {fileID: 1968382406}
+  - component: {fileID: 1968382408}
+  m_Layer: 0
+  m_Name: AbilityGrantTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!135 &1968382406
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1968382405}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 2.59
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!4 &1968382407
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1968382405}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 47.128, y: 12.82592, z: 32.337}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1968382408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1968382405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2544039989bf6ff4ba9626dee76d703f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OnTriggerAddAbility
+  abilityName: Elven Steps
+  bundleId: GetElvenStep
+  singleGrant: 1
 --- !u!33 &42168037358927887
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -59184,3 +59250,4 @@ SceneRoots:
   - {fileID: 2203814181230864804}
   - {fileID: 481953761}
   - {fileID: 978861656}
+  - {fileID: 1968382407}

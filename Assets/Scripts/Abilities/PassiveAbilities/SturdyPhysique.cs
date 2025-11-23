@@ -1,8 +1,8 @@
 using UnityEngine;
 
 [CreateAssetMenu(
-    fileName = "SturdyPhysique",
-    menuName = "Abilities/Passive/SturdyPhysique"
+    fileName = "Sturdy Physique",
+    menuName = "Abilities/Passive/Sturdy Physique"
 )]
 public class SturdyPhysique : Ability
 {

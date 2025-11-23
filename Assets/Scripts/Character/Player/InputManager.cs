@@ -49,6 +49,11 @@ public class InputManager : MonoBehaviour
             return;
         }
 
+        if(GameManager.Instance.IsGameStatePaused)
+        {
+            return;
+        }
+
         playerController.JumpInput = true;
     }
 
@@ -102,6 +107,58 @@ public class InputManager : MonoBehaviour
                     UIManager.Instance.ToogleMenu(MenuType.STATUS);
                     break;
             }
+        }
+    }
+
+    public void FirstAbilityEvent(InputAction.CallbackContext context)
+    {
+        if(context.performed)
+        {
+            if (GameManager.Instance.IsGameStatePaused)
+            {
+                return;
+            }
+
+            AbilityManager.Instance.ActivateBoundAbility(0);
+        }
+    }
+
+    public void SecondAbilityEvent(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            if (GameManager.Instance.IsGameStatePaused)
+            {
+                return;
+            }
+
+            AbilityManager.Instance.ActivateBoundAbility(1);
+        }
+    }
+
+    public void ThirdAbilityEvent(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            if (GameManager.Instance.IsGameStatePaused)
+            {
+                return;
+            }
+
+            AbilityManager.Instance.ActivateBoundAbility(2);
+        }
+    }
+
+    public void FourthAbilityEvent(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            if (GameManager.Instance.IsGameStatePaused)
+            {
+                return;
+            }
+
+            AbilityManager.Instance.ActivateBoundAbility(3);
         }
     }
 }

@@ -78,6 +78,8 @@ MonoBehaviour:
   magicText: {fileID: 0}
   passiveAbilityHolder: {fileID: 0}
   passiveAbilityPrefab: {fileID: 312568877314772352, guid: 4f53142de3a4e5e48a71d49dcdad8508, type: 3}
+  activeAbilityHolder: {fileID: 0}
+  activeAbilityPrefab: {fileID: 4048155653020360312, guid: 9e706ccf0977b184aa1bfdf02d243380, type: 3}
   questsHolder: {fileID: 0}
   questBlockPrefab: {fileID: 304078710177838271, guid: 6e46988ac80f5f84b988a43fe0563b42, type: 3}
   questText: {fileID: 0}
@@ -95,11 +97,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Supervisor
   EventCaps:
   - eventId: Arrow.Health
-    cap: 20
+    cap: 15
   - eventId: Arrow.Agility
-    cap: 20
+    cap: 15
   - eventId: Arrow.Strength
-    cap: 20
+    cap: 15
   EventPools: []
   statAbilityBundles:
   - id: 0
@@ -133,9 +135,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7693b1591703fe54e8e54e7851cea572, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AbilityManager
-  OnPlayerAttack:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &2200900054458749618
 MonoBehaviour:
   m_ObjectHideFlags: 0

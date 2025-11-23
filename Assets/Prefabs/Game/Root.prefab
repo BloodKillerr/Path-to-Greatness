@@ -225,6 +225,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8473419524965217978}
     - target: {fileID: 8958553444487353350, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
+      propertyPath: activeAbilityHolder
+      value: 
+      objectReference: {fileID: 8909585158387435754}
+    - target: {fileID: 8958553444487353350, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
       propertyPath: passiveAbilityHolder
       value: 
       objectReference: {fileID: 4339006123941100821}
@@ -264,10 +268,6 @@ PrefabInstance:
     - target: {fileID: 2769977590197208216, guid: 7aae9c825c99fe947a60a5fcc8fc6b35, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 2966315904858632864, guid: 7aae9c825c99fe947a60a5fcc8fc6b35, type: 3}
-      propertyPath: m_ActionEvents.Array.size
-      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2966315904858632864, guid: 7aae9c825c99fe947a60a5fcc8fc6b35, type: 3}
       propertyPath: m_ActionEvents.Array.data[7].m_ActionId
@@ -750,5 +750,10 @@ GameObject:
 --- !u!225 &8478551844204080953 stripped
 CanvasGroup:
   m_CorrespondingSourceObject: {fileID: 1797985556314721070, guid: ce46d5b0f7a16a74fa3b4623dbbfa367, type: 3}
+  m_PrefabInstance: {fileID: 7879724492793603095}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &8909585158387435754 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 1657135351001443581, guid: ce46d5b0f7a16a74fa3b4623dbbfa367, type: 3}
   m_PrefabInstance: {fileID: 7879724492793603095}
   m_PrefabAsset: {fileID: 0}

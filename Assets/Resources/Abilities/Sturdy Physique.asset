@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Sturdy Physique
   m_EditorClassIdentifier: Assembly-CSharp::SturdyPhysique
   AbilityName: Sturdy Physique
-  Description: 
+  Description: Impervious body technique that enhances all your physical characteristics
   type: 0
   boostAmount: 5

@@ -10,5 +10,6 @@ public abstract class Ability : ScriptableObject
 
     public virtual void OnEquip() { }
     public virtual void OnUnequip() { }
-    public virtual void OnPlayerAttack() { }
+
+    public virtual void Use() { }
 }

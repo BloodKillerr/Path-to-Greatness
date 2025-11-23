@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -41,6 +42,8 @@ public class UIManager : MonoBehaviour
     [Header("Abilities")]
     [SerializeField] private Transform passiveAbilityHolder;
     [SerializeField] private GameObject passiveAbilityPrefab;
+    [SerializeField] private Transform activeAbilityHolder;
+    [SerializeField] private GameObject activeAbilityPrefab;
 
     [Header("Quests")]
     [SerializeField] private Transform questsHolder;
@@ -195,6 +198,7 @@ public class UIManager : MonoBehaviour
                     abilitiesPanel.alpha = 0f;
                     abilitiesPanel.blocksRaycasts = false;
                     abilitiesPanel.interactable = false;
+                    BindingDialog.Instance.HideCanvas();
                 }
                 break;
             case MenuType.QUESTS:
@@ -207,6 +211,93 @@ public class UIManager : MonoBehaviour
                 break;
         }
         GameManager.Instance.ResumeGameState();
+    }
+
+    public void OpenMenuTemporarily(MenuType type)
+    {
+        switch (type)
+        {
+            case MenuType.PAUSE:
+                if (pausePanel != null)
+                {
+                    pausePanel.alpha = 1f;
+                    pausePanel.blocksRaycasts = true;
+                    pausePanel.interactable = true;
+                    ChangeSelectedElement(PauseMenu.Instance.ResumeButton);
+                }
+                break;
+            case MenuType.STATUS:
+                if (statusPanel != null)
+                {
+                    statusPanel.alpha = 1f;
+                    statusPanel.blocksRaycasts = true;
+                    statusPanel.interactable = true;
+                    ChangeSelectedElement(statusSelectObject);
+                    UpdateAbilitiesUI();
+                }
+                break;
+            case MenuType.ABILITIES:
+                if (abilitiesPanel != null)
+                {
+                    abilitiesPanel.alpha = 1f;
+                    abilitiesPanel.blocksRaycasts = true;
+                    abilitiesPanel.interactable = true;
+                    ChangeSelectedElement(abilitiesSelectObject);
+                    UpdateAbilitiesUI();
+                }
+                break;
+            case MenuType.QUESTS:
+                if (questsPanel != null)
+                {
+                    questsPanel.alpha = 1f;
+                    questsPanel.blocksRaycasts = true;
+                    questsPanel.interactable = true;
+                    ChangeSelectedElement(questsSelectObject);
+                    UpdateQuestsUI();
+                    ClearQuestView();
+                }
+                break;
+        }
+    }
+
+    public void CloseMenuTemporarily(MenuType type)
+    {
+        switch (type)
+        {
+            case MenuType.PAUSE:
+                if (pausePanel != null)
+                {
+                    pausePanel.alpha = 0f;
+                    pausePanel.blocksRaycasts = false;
+                    pausePanel.interactable = false;
+                    PauseMenu.Instance.Hide();
+                }
+                break;
+            case MenuType.STATUS:
+                if (statusPanel != null)
+                {
+                    statusPanel.alpha = 0f;
+                    statusPanel.blocksRaycasts = false;
+                    statusPanel.interactable = false;
+                }
+                break;
+            case MenuType.ABILITIES:
+                if (abilitiesPanel != null)
+                {
+                    abilitiesPanel.alpha = 0f;
+                    abilitiesPanel.blocksRaycasts = false;
+                    abilitiesPanel.interactable = false;
+                }
+                break;
+            case MenuType.QUESTS:
+                if (questsPanel != null)
+                {
+                    questsPanel.alpha = 0f;
+                    questsPanel.blocksRaycasts = false;
+                    questsPanel.interactable = false;
+                }
+                break;
+        }
     }
 
     public void TooglePanel(GameObject panelToOpen, GameObject panelToClose)
@@ -284,11 +375,42 @@ public class UIManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        foreach (Ability ability in AbilityManager.Instance.CurrentAbilities)
+        foreach (Ability ability in AbilityManager.Instance.CurrentPassiveAbilities)
         {
             GameObject go = Instantiate(passiveAbilityPrefab, passiveAbilityHolder);
             TMP_Text text = go.GetComponent<TMP_Text>();
             text.text = ability.AbilityName;
+        }
+
+        if (activeAbilityHolder == null)
+        {
+            return;
+        }
+
+        foreach (Transform child in activeAbilityHolder)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (Ability ability in AbilityManager.Instance.CurrentActiveAbilities)
+        {
+            List<int> slots = new List<int>();
+
+            for (int slotIndex = 0; slotIndex < 4; slotIndex++)
+            {
+                Ability bound = AbilityManager.Instance.GetBoundAbility(slotIndex);
+                if (bound != null && bound.AbilityName == ability.AbilityName)
+                {
+                    slots.Add(slotIndex + 1);
+                }
+            }
+
+            string badge = slots.Count > 0 ? $" ({string.Join(",", slots)})" : "";
+
+            GameObject go = Instantiate(activeAbilityPrefab, activeAbilityHolder);
+            TMP_Text text = go.GetComponent<TMP_Text>();
+            text.text = ability.AbilityName + badge;
+            go.GetComponent<AbilityButton>().abilityInstance = ability;
         }
     }
 

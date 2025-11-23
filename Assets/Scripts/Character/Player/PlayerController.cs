@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class PlayerController : MonoBehaviour
     private float verticalVelocity = 0f;
     private float antiBump;
     private bool jumpedLastFrame = false;
+    private float baseJumpSpeed = .8f;
     private float stepOffset;
 
     private float rotationMismatch = 0f;
@@ -23,9 +25,13 @@ public class PlayerController : MonoBehaviour
     private float rotatingToTargetTimer = 0f;
     private bool isRotatingClockwise = false;
 
+    private Coroutine jumpBoostCoroutine;
+
     private PlayerState playerState;
 
     private PlayerMovementState lastMovementState = PlayerMovementState.Falling;
+
+    public bool IsJumpBoostActive => jumpBoostCoroutine != null;
 
     [Header("Movement")]
     public float WalkAcceleration = 25f;
@@ -293,5 +299,46 @@ public class PlayerController : MonoBehaviour
         }
 
         return velocity;
+    }
+
+    public void ApplyTemporaryJumpSpeed(float boostAmount, float duration)
+    {
+        if (duration <= 0f)
+        {
+            return;
+        }
+
+        if (jumpBoostCoroutine != null)
+        {
+            StopCoroutine(jumpBoostCoroutine);
+            jumpBoostCoroutine = null;
+        }
+
+        jumpBoostCoroutine = StartCoroutine(TemporaryJumpCoroutine(boostAmount, duration));
+    }
+
+    private IEnumerator TemporaryJumpCoroutine(float boostAmount, float duration)
+    {
+        JumpSpeed = baseJumpSpeed + boostAmount;
+
+        float timer = 0f;
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        JumpSpeed = baseJumpSpeed;
+        jumpBoostCoroutine = null;
+    }
+
+    public void CancelTemporaryJumpSpeed()
+    {
+        if (jumpBoostCoroutine != null)
+        {
+            StopCoroutine(jumpBoostCoroutine);
+            jumpBoostCoroutine = null;
+        }
+        JumpSpeed = baseJumpSpeed;
     }
 }

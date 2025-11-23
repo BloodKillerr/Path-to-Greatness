@@ -2,16 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class AbilityManager : MonoBehaviour
 {
-    private List<Ability> currentAbilities = new List<Ability>();
+    private List<Ability> currentPassiveAbilities = new List<Ability>();
+    private List<Ability> currentActiveAbilities = new List<Ability>();
 
-    public UnityEvent OnPlayerAttack;
+    private Ability[] boundAbilities = new Ability[4];
 
     public static AbilityManager Instance { get; private set; }
-    public List<Ability> CurrentAbilities { get => currentAbilities; set => currentAbilities = value; }
+    public List<Ability> CurrentPassiveAbilities { get => currentPassiveAbilities; set => currentPassiveAbilities = value; }
+    public List<Ability> CurrentActiveAbilities { get => currentActiveAbilities; set => currentActiveAbilities = value; }
+    public Ability[] BoundAbilities { get => boundAbilities; set => boundAbilities = value; }
 
     private void Awake()
     {
@@ -27,64 +29,169 @@ public class AbilityManager : MonoBehaviour
 
     public void AddAbility(Ability newAbility)
     {
-        foreach (Ability ability in currentAbilities)
-        {
-            if (ability.AbilityName == newAbility.AbilityName)
-            {
-                return;
-            }
-        }
-
         Ability copy = Instantiate(newAbility);
-        currentAbilities.Add(copy);
+
+        if(copy.type == Ability.AbilityType.Passive)
+        {
+            foreach (Ability ability in currentPassiveAbilities)
+            {
+                if (ability.AbilityName == newAbility.AbilityName)
+                {
+                    return;
+                }
+            }
+
+            currentPassiveAbilities.Add(copy);
+        }
+        else if(copy.type == Ability.AbilityType.Active)
+        {
+            foreach (Ability ability in currentActiveAbilities)
+            {
+                if (ability.AbilityName == newAbility.AbilityName)
+                {
+                    return;
+                }
+            }
+
+            currentActiveAbilities.Add(copy);
+        }
+        
         copy.OnEquip();
 
-        if (newAbility.type == Ability.AbilityType.Active)
-        {
-            OnPlayerAttack.AddListener(copy.OnPlayerAttack);
-        }
         UIManager.Instance.UpdateAbilitiesUI();
     }
 
     public void RemoveAbility(Ability ability)
     {
-        foreach (Ability ab in currentAbilities)
+        foreach (Ability ab in currentPassiveAbilities)
         {
             if (ab.AbilityName == ability.AbilityName)
             {
                 ab.OnUnequip();
 
-                if (ab.type == Ability.AbilityType.Active)
-                {
-                    OnPlayerAttack.RemoveListener(ab.OnPlayerAttack);
-                }
-
-                currentAbilities.Remove(ab);
+                currentPassiveAbilities.Remove(ab);
                 break;
             }
         }
+
+        foreach (Ability ab in currentActiveAbilities)
+        {
+            if (ab.AbilityName == ability.AbilityName)
+            {
+                ab.OnUnequip();
+
+                currentActiveAbilities.Remove(ab);
+
+                for (int i = 0; i < boundAbilities.Length; i++)
+                {
+                    if (boundAbilities[i] != null && boundAbilities[i].AbilityName == ab.AbilityName)
+                    {
+                        boundAbilities[i] = null;
+                    }
+                }
+
+                break;
+            }
+        }
+
         UIManager.Instance.UpdateAbilitiesUI();
     }
 
     public void RemoveAllAbilities()
     {
-        foreach (Ability ability in currentAbilities.ToList())
+        foreach (Ability ability in currentPassiveAbilities.ToList())
         {
             RemoveAbility(ability);
         }
 
-        currentAbilities.Clear();
+        foreach (Ability ability in currentActiveAbilities.ToList())
+        {
+            RemoveAbility(ability);
+        }
+
+        currentPassiveAbilities.Clear();
         UIManager.Instance.UpdateAbilitiesUI();
     }
 
     public bool HasAbility(Type abilityType)
     {
-        return currentAbilities.Any(a => a.GetType() == abilityType);
+        return currentPassiveAbilities.Any(a => a.GetType() == abilityType);
+    }
+
+    public bool BindAbilityToSlot(Ability ability, int slot)
+    {
+        if (slot < 0 || slot >= boundAbilities.Length)
+        {
+            return false;
+        }
+
+        if (ability == null)
+        {
+            UnbindSlot(slot);
+            return true;
+        }
+
+        if (ability.type != Ability.AbilityType.Active)
+        {
+            Debug.LogWarning("[AbilityManager] Only active abilities can be bound to slots.");
+            return false;
+        }
+
+        Ability runtimeInstance = currentActiveAbilities.FirstOrDefault(a => a.AbilityName == ability.AbilityName) ?? ability;
+
+        for (int i = 0; i < boundAbilities.Length; i++)
+        {
+            if (boundAbilities[i] != null && boundAbilities[i].AbilityName == runtimeInstance.AbilityName)
+            {
+                boundAbilities[i] = null;
+            }
+        }
+
+        boundAbilities[slot] = runtimeInstance;
+        UIManager.Instance.UpdateAbilitiesUI();
+        return true;
+    }
+
+    public void UnbindSlot(int slot)
+    {
+        if (slot < 0 || slot >= boundAbilities.Length)
+        {
+            return;
+        }
+
+        boundAbilities[slot] = null;
+        UIManager.Instance.UpdateAbilitiesUI();
+    }
+
+    public Ability GetBoundAbility(int slot)
+    {
+        if (slot < 0 || slot >= boundAbilities.Length)
+        {
+            return null;
+        }
+
+        return boundAbilities[slot];
+    }
+
+    public void ActivateBoundAbility(int slot)
+    {
+        if (slot < 0 || slot >= boundAbilities.Length)
+        {
+            return;
+        }
+
+        Ability ability = boundAbilities[slot];
+        if (ability == null)
+        {
+            return;
+        }
+
+        ability.Use();
     }
 
     //public List<string> GetCurrentAbilityNames()
     //{
-    //    return currentAbilities.Select(a => a.AbilityName).ToList();
+    //    return currentPassiveAbilities.Select(a => a.AbilityName).ToList();
     //}
 
     //public void SetCurrentAbilitiesByName(List<string> names)
@@ -104,6 +211,4 @@ public class AbilityManager : MonoBehaviour
     //        }
     //    }
     //}
-
-    public void PlayerDidAttack() => OnPlayerAttack?.Invoke();
 }

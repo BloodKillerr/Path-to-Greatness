@@ -39,6 +39,8 @@ public class RandomSphereSpawner : MonoBehaviour
 
     const float defaultMeshBaseRadius = 0.5f;
 
+    public int nextSceneIndex = 6;
+
     [ContextMenu("Generate Spheres")]
     public void Generate()
     {
@@ -344,6 +346,7 @@ public class RandomSphereSpawner : MonoBehaviour
 
             float portalYOffset = 0.02f;
             GameObject portalInstance = Instantiate(portalPrefab, new Vector3(bestGo.transform.position.x, sphereTopY + portalYOffset, bestGo.transform.position.z), Quaternion.identity, transform);
+            portalInstance.GetComponent<SceneChangeDoor>().SceneIndex = nextSceneIndex;
             Renderer portalRend = portalInstance.GetComponentInChildren<Renderer>();
             float portalBottomY = float.MinValue;
             if (portalRend != null)
