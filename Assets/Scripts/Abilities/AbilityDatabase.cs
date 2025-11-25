@@ -12,7 +12,6 @@ public class AbilityDatabase : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     public Ability GetByName(string abilityName)

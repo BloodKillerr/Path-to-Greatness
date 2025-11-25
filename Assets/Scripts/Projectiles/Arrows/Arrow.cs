@@ -31,6 +31,12 @@ public class Arrow : MonoBehaviour
             TriggerUpgrade(other.gameObject);
             Destroy(this);
         }
+
+        if(other.CompareTag("Attack") && eventId == "Arrow.Strength")
+        {
+            TriggerUpgrade(Player.Instance.gameObject);
+            Destroy(this);
+        }
     }
 
     private void OnTriggerExit(Collider other)

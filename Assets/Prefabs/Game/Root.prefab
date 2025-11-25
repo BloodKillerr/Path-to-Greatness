@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 725d7cd577d264444a0f27a2f6035536, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PersistBetweenScenes
-  allowedScenes: 010000000200000003000000040000000500000006000000
+  allowedScenes: 0100000002000000030000000400000005000000060000000700000008000000090000000a000000
 --- !u!1001 &304744805094201832
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -160,6 +160,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4599317681303721506, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
+      propertyPath: AbilitySpawnPoint
+      value: 
+      objectReference: {fileID: 3913769606685227283}
     - target: {fileID: 7766940640006406333, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
       propertyPath: m_Name
       value: GameManager
@@ -325,6 +329,11 @@ PrefabInstance:
 --- !u!4 &1286002972078960870 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8445306224194621727, guid: 7aae9c825c99fe947a60a5fcc8fc6b35, type: 3}
+  m_PrefabInstance: {fileID: 7271921037222666745}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3913769606685227283 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5961513696330619114, guid: 7aae9c825c99fe947a60a5fcc8fc6b35, type: 3}
   m_PrefabInstance: {fileID: 7271921037222666745}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7273551737472332797

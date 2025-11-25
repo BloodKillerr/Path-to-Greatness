@@ -10,6 +10,8 @@ public class AbilityManager : MonoBehaviour
 
     private Ability[] boundAbilities = new Ability[4];
 
+    public Transform AbilitySpawnPoint;
+
     public static AbilityManager Instance { get; private set; }
     public List<Ability> CurrentPassiveAbilities { get => currentPassiveAbilities; set => currentPassiveAbilities = value; }
     public List<Ability> CurrentActiveAbilities { get => currentActiveAbilities; set => currentActiveAbilities = value; }
@@ -186,7 +188,16 @@ public class AbilityManager : MonoBehaviour
             return;
         }
 
+        if (!AbilityCooldownManager.Instance.TryUse(ability))
+        {
+            return;
+        }
+
+        AbilityUseContext.SpawnPoint = AbilitySpawnPoint;
+
         ability.Use();
+
+        AbilityUseContext.SpawnPoint = null;
     }
 
     //public List<string> GetCurrentAbilityNames()

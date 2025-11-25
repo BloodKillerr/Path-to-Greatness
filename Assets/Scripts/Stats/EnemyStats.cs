@@ -1,8 +1,31 @@
 using UnityEngine;
+using UnityEngine.Events;
+
+public enum EnemyGroupType
+{
+    Ground
+}
+
+public enum EnemyType
+{
+    Skeleton,
+
+    Custom
+}
 
 public class EnemyStats : CharacterStats
 {
-    [SerializeField] private Stat movementSpeed;
+    [Header("Classification")]
+    public EnemyGroupType GroupType = EnemyGroupType.Ground;
+    public EnemyType Type = EnemyType.Skeleton;
 
-    public Stat MovementSpeed { get => movementSpeed; set => movementSpeed = value; }
+    public override void Die()
+    {
+        base.Die();
+        Animator childAnimator = GetComponentInChildren<Animator>();
+        if (childAnimator != null)
+        {
+            childAnimator.Play("Death");
+        }
+    }
 }

@@ -5037,6 +5037,75 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 553776326160384965, guid: 19dcf97aea3f18040802bc0eea1cc119, type: 3}
   m_PrefabInstance: {fileID: 181004848}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &181619901
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 181619904}
+  - component: {fileID: 181619902}
+  - component: {fileID: 181619905}
+  m_Layer: 0
+  m_Name: AbilityGrantTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &181619902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 181619901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2544039989bf6ff4ba9626dee76d703f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OnTriggerAddAbility
+  abilityName: Slash
+  bundleId: GetSlash
+  singleGrant: 1
+--- !u!4 &181619904
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 181619901}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 25.04, y: 1.595, z: 33.028}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &181619905
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 181619901}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 7.03, y: 2.81, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &181714293
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -50869,10 +50938,6 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8750588282511164768, guid: d0e1a8481dd66d042869ef4b8327a577, type: 3}
-      propertyPath: m_Name
-      value: UI
-      objectReference: {fileID: 0}
     - target: {fileID: 8909585158387435754, guid: d0e1a8481dd66d042869ef4b8327a577, type: 3}
       propertyPath: m_SizeDelta.x
       value: 0
@@ -51127,3 +51192,4 @@ SceneRoots:
   - {fileID: 4073036554921072649}
   - {fileID: 1171574199}
   - {fileID: 1628177449}
+  - {fileID: 181619904}
