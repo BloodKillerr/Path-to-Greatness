@@ -92,6 +92,7 @@ public class Slash : Ability
             }
 
             GameObject spawned = Instantiate(AttackPrefab, pos, finalRot);
+            SoundManager.PlaySound(SoundType.SLASH, spawned.GetComponent<AudioSource>(), 1);
         }
     }
 }

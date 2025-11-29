@@ -46,7 +46,7 @@ public class EnemyAnimationHandler : MonoBehaviour
         enemy?.DamageCollider?.EnableDamageCollider();
         if (playSoundOnAttack && enemy != null)
         {
-            //SoundManager.PlaySound(enemy.SoundType, GetComponentInParent<AudioSource>(), 1);
+            SoundManager.PlaySound(enemy.SoundType, GetComponentInParent<AudioSource>(), 1);
         }
     }
 

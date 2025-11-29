@@ -23,6 +23,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private CanvasGroup statusPanel;
     [SerializeField] private CanvasGroup abilitiesPanel;
     [SerializeField] private CanvasGroup questsPanel;
+    [SerializeField] private CanvasGroup messagePanel;
 
     [Header("Select Objects")]
 
@@ -50,8 +51,14 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject questBlockPrefab;
     [SerializeField] private TMP_Text questText;
 
+    [Header("Message")]
+    [SerializeField] private TMP_Text messageTitleText;
+    [SerializeField] private TMP_Text messageBodyText;
+    private bool messageOpen = false;
+
     public static UIManager Instance { get; private set; }
     public MenuType CurrentMenuType { get => currentMenuType; set => currentMenuType = value; }
+    public bool MessageOpen { get => messageOpen; set => messageOpen = value; }
 
     private void Awake()
     {
@@ -482,5 +489,79 @@ public class UIManager : MonoBehaviour
         }
 
         return eventId.Replace('.', ' ').Replace('_', ' ');
+    }
+
+    public void ShowScreenMessage(string title, string body, Dictionary<string, object> extraData = null)
+    {
+        if (messagePanel == null)
+        {
+            return;
+        }
+
+        messageOpen = true;
+
+        SoundManager.PlaySound(SoundType.MESSAGE, Player.Instance.GetComponent<AudioSource>(), 1);
+
+        GameManager.Instance.PauseGameState();
+
+        messagePanel.alpha = 1f;
+        messagePanel.blocksRaycasts = true;
+        messagePanel.interactable = true;
+
+        if (messageTitleText != null)
+        {
+            messageTitleText.text = title ?? "";
+        }
+
+        if (messageBodyText != null)
+        {
+            messageBodyText.text = body ?? "";
+        }
+
+        if (extraData != null)
+        {
+            if (extraData.TryGetValue("rewardType", out var rtObj) && rtObj is string rt)
+            {
+                
+                string display = "";
+                if (rt == "StatUpgrade")
+                {
+                    if (extraData.TryGetValue("stat", out var sObj) && extraData.TryGetValue("amount", out var aObj))
+                    {
+                        display = $"+{aObj} {sObj}";
+
+                        if (messageBodyText != null)
+                        {
+                            messageBodyText.text += string.Format("\n\nRewards:\n{0}", display);
+                        }
+                    }
+                }
+                else if (rt == "AbilityGrant")
+                {
+                    if (extraData.TryGetValue("abilityName", out var aName))
+                    {
+                        display = (string)aName;
+
+                        if (messageBodyText != null)
+                        {
+                            messageBodyText.text += string.Format("\n\nRewards:\n{0}", display);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void CloseScreenMessage()
+    {
+        if (messagePanel != null)
+        {
+            messagePanel.alpha = 0f;
+            messagePanel.blocksRaycasts = false;
+            messagePanel.interactable = false;
+            messageOpen = false;
+
+            GameManager.Instance.ResumeGameState();
+        }
     }
 }

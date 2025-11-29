@@ -4,6 +4,7 @@ using UnityEngine;
 public class OnTriggerAddAbility : MonoBehaviour
 {
     public string abilityName;
+    public string abilityDesc;
     public string bundleId;
     public bool singleGrant = true;
 
@@ -15,6 +16,7 @@ public class OnTriggerAddAbility : MonoBehaviour
             {
                 { "target", other.gameObject },
                 { "abilityName", abilityName },
+                { "abilityDesc", abilityDesc },
                 { "bundleId", bundleId },
                 { "singleGrant", singleGrant }
             };

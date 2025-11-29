@@ -512,6 +512,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OnTriggerAddAbility
   abilityName: Elven Steps
+  abilityDesc: Swift steps that let you reach further than any other
   bundleId: GetElvenStep
   singleGrant: 1
 --- !u!33 &42168037358927887

@@ -47,7 +47,7 @@ public class Enemy : MonoBehaviour, IEnemyDeathListener
 
     private EnemyHealthUI healthUI;
 
-    //public SoundType SoundType;
+    public SoundType SoundType;
 
     public event Action OnDeath;
 

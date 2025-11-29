@@ -19005,7 +19005,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: D-Pad Down
+  m_text: D-Pad/Down
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1be3369ccc3f85d45814c9692293b9cd, type: 2}
   m_sharedMaterial: {fileID: -1799976447687815200, guid: 1be3369ccc3f85d45814c9692293b9cd, type: 2}
@@ -20403,7 +20403,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: D-Pad Right
+  m_text: D-Pad/Right
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1be3369ccc3f85d45814c9692293b9cd, type: 2}
   m_sharedMaterial: {fileID: -1799976447687815200, guid: 1be3369ccc3f85d45814c9692293b9cd, type: 2}
@@ -21568,7 +21568,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: D-Pad Left
+  m_text: D-Pad/Left
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1be3369ccc3f85d45814c9692293b9cd, type: 2}
   m_sharedMaterial: {fileID: -1799976447687815200, guid: 1be3369ccc3f85d45814c9692293b9cd, type: 2}
@@ -27504,7 +27504,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: D-Pad Up
+  m_text: D-Pad/Up
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1be3369ccc3f85d45814c9692293b9cd, type: 2}
   m_sharedMaterial: {fileID: -1799976447687815200, guid: 1be3369ccc3f85d45814c9692293b9cd, type: 2}
@@ -28232,6 +28232,8 @@ PrefabInstance:
     - {fileID: 4599317681303721506, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
     - {fileID: 2200900054458749618, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
     - {fileID: 7640886292687551011, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
+    - {fileID: 8850542891543047785, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
+    - {fileID: 8334851285557228846, guid: 435ae8ac931739f41bec97ccefaeffa2, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

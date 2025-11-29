@@ -28,6 +28,7 @@ public class StatAbilityBundle
     public int magicThreshold = 0;
 
     public string abilityName;
+    public string abilityDesc;
 
     public bool singleGrantPerPlayer = true;
 }
@@ -321,6 +322,7 @@ public class Supervisor : MonoBehaviour
     {
         GameObject player = ev.Get<GameObject>("target", null);
         string abilityName = ev.Get<string>("abilityName", null);
+        string abilityDesc = ev.Get<string>("abilityDesc", null);
         string bundleId = ev.Get<string>("bundleId", null);
         bool singleGrant = ev.Get<bool>("singleGrant", true);
 
@@ -354,6 +356,7 @@ public class Supervisor : MonoBehaviour
         {
             { "target", player },
             { "abilityName", abilityName },
+            { "abilityDesc", abilityDesc },
             { "bundleId", idToMark }
         };
         EventBus.Instance.Publish(new SupervisorEvent("Supervisor.AbilityGranted", gameObject, data));
@@ -482,7 +485,8 @@ public class Supervisor : MonoBehaviour
         {
             { "target", player },
             { "bundleId", bundle.id },
-            { "abilityName", bundle.abilityName }
+            { "abilityName", bundle.abilityName },
+            { "abilityDesc", bundle.abilityDesc }
         };
         EventBus.Instance.Publish(new SupervisorEvent("Supervisor.AbilityGranted", gameObject, data));
     }

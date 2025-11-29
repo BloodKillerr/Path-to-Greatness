@@ -43,6 +43,36 @@ public class QuestManager : MonoBehaviour
         QuestInstance instance = new QuestInstance(quest, player, OnQuestCompleted, OnQuestProgressChanged);
         list.Add(instance);
 
+        var eventData = new Dictionary<string, object>()
+        {
+            { "target", player },
+            { "questId", quest.questId },
+            { "questTitle", quest.title },
+            { "questDesc", quest.description },
+            { "requirementsCount", quest.requirements?.Count ?? 0 },
+            { "rewardType", quest.rewardType.ToString() }
+        };
+
+        if (quest.rewardType == QuestRewardType.StatUpgrade)
+        {
+            eventData["stat"] = quest.rewardStat;
+            eventData["amount"] = quest.rewardAmount;
+        }
+        else if (quest.rewardType == QuestRewardType.AbilityGrant)
+        {
+            eventData["abilityName"] = quest.rewardAbilityName;
+            eventData["singleGrant"] = quest.singleGrantPerPlayer;
+        }
+
+        if (EventBus.Instance != null)
+        {
+            EventBus.Instance.Publish(new SupervisorEvent("Quest.QuestAdded", this.gameObject, eventData));
+        }
+        else
+        {
+            Debug.LogWarning("[QuestManager] EventBus.Instance is null — Quest.QuestAdded was not published.");
+        }
+
         Debug.Log($"[QuestManager] Quest '{quest.title}' added for {player.name}");
         return true;
     }
@@ -84,6 +114,7 @@ public class QuestManager : MonoBehaviour
         GameObject player = inst.player;
         Debug.Log($"[QuestManager] Quest '{inst.quest.title}' completed for {player.name}");
         ApplyReward(inst.quest, player);
+
         if (activeQuests.TryGetValue(player, out var list))
         {
             list.Remove(inst);
@@ -94,6 +125,7 @@ public class QuestManager : MonoBehaviour
             { "questId", inst.quest.questId },
             { "questTitle", inst.quest.title }
         };
+        MessageManager.Instance.HandleSpawnWorld(string.Format("{0} Completed!", inst.quest.title));
         EventBus.Instance.Publish(new SupervisorEvent("Quest.QuestCompleted", gameObject, data));
     }
 

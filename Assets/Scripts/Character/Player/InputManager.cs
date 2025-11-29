@@ -82,7 +82,7 @@ public class InputManager : MonoBehaviour
 
     public void PauseResumeEvent(InputAction.CallbackContext context)
     {
-        if (context.performed && !Player.Instance.IsDead && !PauseMenu.Instance.RebindingUI.activeSelf)
+        if (context.performed && !Player.Instance.IsDead && !PauseMenu.Instance.RebindingUI.activeSelf && !UIManager.Instance.MessageOpen)
         {
             UIManager.Instance.ToogleMenu(MenuType.PAUSE);
         }
@@ -90,7 +90,7 @@ public class InputManager : MonoBehaviour
 
     public void CharacterEvent(InputAction.CallbackContext context)
     {
-        if (context.performed && !Player.Instance.IsDead)
+        if (context.performed && !Player.Instance.IsDead && !UIManager.Instance.MessageOpen)
         {
             switch(UIManager.Instance.CurrentMenuType)
             {

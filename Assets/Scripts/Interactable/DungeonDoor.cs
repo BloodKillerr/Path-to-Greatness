@@ -18,9 +18,6 @@ public class DungeonDoor : Interactable
             roomController.MovePlayerThroughDoor(direction);
         }
 
-        //if (GetComponentInParent<RoomController>().IsFinished)
-        //{
-        //    SoundManager.PlaySound(SoundType.DOOR, GetComponent<AudioSource>(), 1);
-        //}
+        SoundManager.PlaySound(SoundType.DOOR, GetComponent<AudioSource>(), .5f);
     }
 }

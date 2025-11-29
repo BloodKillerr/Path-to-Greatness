@@ -7,6 +7,9 @@ public class SceneChangeDoor : Interactable
     public override void Interact()
     {
         base.Interact();
+
+        SoundManager.PlaySound(SoundType.DOOR, GetComponent<AudioSource>(), 1);
+
         SceneManager.LoadScene(SceneIndex);
     }
 }
