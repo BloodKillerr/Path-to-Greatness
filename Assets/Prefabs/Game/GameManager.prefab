@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8964391178651412497}
   - component: {fileID: 8958553444487353350}
   - component: {fileID: 9017835988333107492}
+  - component: {fileID: 1162785887195119303}
   - component: {fileID: 7064528366429988106}
   - component: {fileID: 4599317681303721506}
   - component: {fileID: 2200900054458749618}
@@ -119,6 +120,20 @@ MonoBehaviour:
     abilityName: Sturdy Physique
     abilityDesc: Impervious body technique that enhances all your physical characteristics
     singleGrantPerPlayer: 1
+--- !u!114 &1162785887195119303
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7766940640006406333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a44b9aac15ca014ea1a62485ff760c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LoadSceneAsync
+  loadingPanel: {fileID: 0}
+  loadingSlider: {fileID: 0}
 --- !u!114 &7064528366429988106
 MonoBehaviour:
   m_ObjectHideFlags: 0

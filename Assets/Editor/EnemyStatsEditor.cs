@@ -47,7 +47,9 @@ public class EnemyStatsEditor : Editor
         switch (group)
         {
             case EnemyGroupType.Ground:
-                return new EnemyType[] { EnemyType.Skeleton, EnemyType.Custom };
+                return new EnemyType[] { EnemyType.Skeleton, EnemyType.Imp, EnemyType.Custom };
+            case EnemyGroupType.Air:
+                return new EnemyType[] { EnemyType.Dragon, EnemyType.Custom };
             default:
                 return new EnemyType[] { EnemyType.Custom };
         }

@@ -3,12 +3,15 @@ using UnityEngine.Events;
 
 public enum EnemyGroupType
 {
-    Ground
+    Ground,
+    Air
 }
 
 public enum EnemyType
 {
     Skeleton,
+    Dragon,
+    Imp,
 
     Custom
 }

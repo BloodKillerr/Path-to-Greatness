@@ -10,6 +10,6 @@ public class SceneChangeDoor : Interactable
 
         SoundManager.PlaySound(SoundType.DOOR, GetComponent<AudioSource>(), 1);
 
-        SceneManager.LoadScene(SceneIndex);
+        LoadSceneAsync.Instance.LoadScene(SceneIndex);
     }
 }

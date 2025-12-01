@@ -25,7 +25,7 @@ public class MainMenu : MonoBehaviour
 
     public void StartGame()
     {
-        SceneManager.LoadScene(nextSceneIndex);
+        LoadSceneAsync.Instance.LoadScene(nextSceneIndex);
     }
 
     public void ContinueGame()
