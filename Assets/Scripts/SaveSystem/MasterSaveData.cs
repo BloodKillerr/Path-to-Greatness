@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using static StatUpgradeEffectSO;
 
 [Serializable]
 public class MasterSaveData
@@ -13,9 +14,15 @@ public class MasterSaveData
 
     public DungeonData DungeonData;
 
-    public List<EnemySaveData> enemies;
+    public List<EnemySaveData> Enemies;
 
-    public List<EnemySpawnerSaveData> spawners;
+    public List<EnemySpawnerSaveData> Spawners;
+
+    public AbilitySaveData abilityData;
+
+    public QuestSaveData questData;
+
+    public SupervisorSaveData supervisorData;
 }
 
 [Serializable]
@@ -98,4 +105,43 @@ public class EnemySpawnerSaveData
     public int currentAlive;
     public int pendingSpawns;
     public int totalSpawned;
+}
+
+[Serializable]
+public class AbilitySaveData
+{
+    public List<string> passiveAbilityNames = new List<string>();
+    public List<string> activeAbilityNames = new List<string>();
+    public string[] boundAbilityNames = new string[4];
+    public List<string> cooldownAbilityNames = new List<string>();
+    public List<float> cooldownsSeconds = new List<float>();
+}
+
+[Serializable]
+public class QuestInstanceSaveData
+{
+    public string questId;
+    public List<string> eventIds = new List<string>();
+    public List<int> progressValues = new List<int>();
+}
+
+[Serializable]
+public class QuestSaveData
+{
+    public List<QuestInstanceSaveData> activeQuests = new List<QuestInstanceSaveData>();
+    public List<string> completedQuestIds = new List<string>();
+}
+
+[Serializable]
+public class SupervisorSaveData
+{
+    public List<EventCap> eventCaps = new List<EventCap>();
+
+    public List<string> eventCountIds = new List<string>();
+    public List<int> eventCountValues = new List<int>();
+
+    public List<StatType> statGainTypes = new List<StatType>();
+    public List<int> statGainValues = new List<int>();
+
+    public List<string> grantedAbilityIds = new List<string>();
 }

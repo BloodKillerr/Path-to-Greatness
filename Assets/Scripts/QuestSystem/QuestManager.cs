@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using static StatUpgradeEffectSO;
 public class QuestManager : MonoBehaviour
 {
     private readonly Dictionary<GameObject, List<QuestInstance>> activeQuests = new();
+
+    private readonly Dictionary<GameObject, HashSet<string>> completedQuests = new();
 
     public static QuestManager Instance { get; private set; }
 
@@ -25,6 +28,12 @@ public class QuestManager : MonoBehaviour
     {
         if (quest == null || player == null)
         {
+            return false;
+        }
+
+        if (completedQuests.TryGetValue(player, out var completedSet) && completedSet.Contains(quest.questId))
+        {
+            Debug.Log($"[QuestManager] Player {player.name} already completed quest {quest.title} — skipping add.");
             return false;
         }
 
@@ -113,6 +122,14 @@ public class QuestManager : MonoBehaviour
 
         GameObject player = inst.player;
         Debug.Log($"[QuestManager] Quest '{inst.quest.title}' completed for {player.name}");
+
+        if (!completedQuests.TryGetValue(player, out var set))
+        {
+            set = new HashSet<string>();
+            completedQuests[player] = set;
+        }
+        set.Add(inst.quest.questId);
+
         ApplyReward(inst.quest, player);
 
         if (activeQuests.TryGetValue(player, out var list))
@@ -191,6 +208,134 @@ public class QuestManager : MonoBehaviour
                 };
                 EventBus.Instance.Publish(new SupervisorEvent("Supervisor.GrantAbilityRequest", gameObject, req));
                 break;
+        }
+    }
+
+    public QuestSaveData CollectActiveQuestsForPlayer(GameObject player)
+    {
+        QuestSaveData qsd = new QuestSaveData();
+        if (player == null)
+        {
+            return qsd;
+        }
+
+        if (!activeQuests.TryGetValue(player, out var list) || list == null)
+        {
+            list = null;
+        }
+
+        if (list != null)
+        {
+            foreach (QuestInstance inst in list)
+            {
+                QuestInstanceSaveData sid = new QuestInstanceSaveData();
+                sid.questId = inst.quest.questId;
+                foreach (QuestRequirement req in inst.quest.requirements)
+                {
+                    sid.eventIds.Add(req.eventId);
+                    sid.progressValues.Add(inst.GetProgress(req.eventId));
+                }
+                qsd.activeQuests.Add(sid);
+            }
+        }
+
+        if (completedQuests.TryGetValue(player, out var completedSet) && completedSet != null)
+        {
+            foreach (string qid in completedSet)
+            {
+                qsd.completedQuestIds.Add(qid);
+            }
+        }
+
+        return qsd;
+    }
+
+    public void RestoreActiveQuestsForPlayer(GameObject player, QuestSaveData saved)
+    {
+        if (player == null || saved == null)
+        {
+            return;
+        }
+
+        if (!completedQuests.ContainsKey(player))
+        {
+            completedQuests[player] = new HashSet<string>();
+        }
+
+        completedQuests[player].Clear();
+        foreach (string id in saved.completedQuestIds)
+        {
+            if (!string.IsNullOrEmpty(id))
+            {
+                completedQuests[player].Add(id);
+            }
+        }
+
+        if (activeQuests.TryGetValue(player, out var existingList) && existingList != null)
+        {
+            foreach (QuestInstance inst in existingList.ToList())
+            {
+                inst.Dispose();
+            }
+            existingList.Clear();
+        }
+        else
+        {
+            activeQuests[player] = new List<QuestInstance>();
+        }
+
+        QuestSO FindQuestSOById(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return null;
+            }
+
+            QuestSO[] all = Resources.LoadAll<QuestSO>("Quests");
+            foreach (QuestSO q in all)
+            {
+                if (q != null && q.questId == id)
+                {
+                    return q;
+                }
+            }
+
+            return null;
+        }
+
+        foreach (QuestInstanceSaveData sInst in saved.activeQuests)
+        {
+            if (completedQuests[player].Contains(sInst.questId))
+            {
+                Debug.Log($"[QuestManager] Skipping restore of active quest '{sInst.questId}' for {player.name} because it is marked completed.");
+                continue;
+            }
+
+            QuestSO qso = FindQuestSOById(sInst.questId);
+            if (qso == null)
+            {
+                Debug.LogWarning($"[QuestManager] Could not find QuestSO '{sInst.questId}' in Resources/Quests.");
+                continue;
+            }
+
+            bool added = AddQuest(qso, player);
+            if (!added)
+            {
+                continue;
+            }
+
+            QuestInstance instance = activeQuests[player].FirstOrDefault(x => x.quest.questId == sInst.questId);
+            if (instance != null)
+            {
+                Dictionary<string, int> dict = new Dictionary<string, int>();
+                for (int i = 0; i < sInst.eventIds.Count; i++)
+                {
+                    string id = sInst.eventIds[i];
+                    int val = (i < sInst.progressValues.Count) ? sInst.progressValues[i] : 0;
+                    dict[id] = val;
+                }
+                instance.RestoreProgress(dict);
+            }
         }
     }
 }

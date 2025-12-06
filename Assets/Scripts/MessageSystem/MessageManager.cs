@@ -256,6 +256,11 @@ public class MessageManager : MonoBehaviour
 
     private void ShowScreenPanel(SupervisorEvent ev)
     {
+        if(SaveManager.IsLoadingSave)
+        {
+            return;
+        }
+
         string title = ev.Get<string>(MessageKeys.Title, null);
         string body = ev.Get<string>(MessageKeys.Body, null);
         Dictionary<string, object> extra = ev.Get<Dictionary<string, object>>(MessageKeys.Data, null);
@@ -267,6 +272,11 @@ public class MessageManager : MonoBehaviour
     #region Convenience helpers (publishers)
     public void PublishWorld(GameObject target, string text, float duration = -1f)
     {
+        if (SaveManager.IsLoadingSave)
+        {
+            return;
+        }
+
         if (target == null)
         {
             return;
@@ -318,6 +328,11 @@ public class MessageManager : MonoBehaviour
 
     public void PublishScreen(string title, string body, Dictionary<string, object> extra = null)
     {
+        if (SaveManager.IsLoadingSave)
+        {
+            return;
+        }
+
         var data = new Dictionary<string, object>()
         {
             { MessageKeys.Title, title },

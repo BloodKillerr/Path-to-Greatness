@@ -75,4 +75,30 @@ public class QuestInstance
     {
         return progress.TryGetValue(eventId, out var p) ? p : 0;
     }
+
+    public void RestoreProgress(Dictionary<string, int> savedProgress)
+    {
+        if (savedProgress == null)
+        {
+            return;
+        }
+
+        foreach (QuestRequirement req in quest.requirements)
+        {
+            if (string.IsNullOrEmpty(req.eventId))
+            {
+                continue;
+            }
+
+            int val = 0;
+            if (savedProgress.TryGetValue(req.eventId, out var v))
+            {
+                val = Mathf.Clamp(v, 0, req.requiredAmount);
+            }
+
+            progress[req.eventId] = val;
+
+            onProgressChanged?.Invoke(this, req.eventId, progress[req.eventId], req.requiredAmount);
+        }
+    }
 }

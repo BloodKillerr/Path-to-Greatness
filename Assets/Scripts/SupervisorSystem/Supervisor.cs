@@ -507,4 +507,100 @@ public class Supervisor : MonoBehaviour
             perPlayerGrantedAbilityIds[player].Clear();
         }
     }
+
+    public SupervisorSaveData CollectSupervisorState()
+    {
+        SupervisorSaveData d = new SupervisorSaveData();
+
+        d.eventCaps = EventCaps != null ? new List<EventCap>(EventCaps) : new List<EventCap>();
+
+        GameObject p = Player.Instance?.gameObject;
+        if (p == null)
+        {
+            return d;
+        }
+
+        if (eventCounts.TryGetValue(p, out var map))
+        {
+            foreach (var kv in map)
+            {
+                d.eventCountIds.Add(kv.Key);
+                d.eventCountValues.Add(kv.Value);
+            }
+        }
+
+        if (perPlayerStatGains.TryGetValue(p, out var statMap))
+        {
+            foreach (var kv in statMap)
+            {
+                d.statGainTypes.Add(kv.Key);
+                d.statGainValues.Add(kv.Value);
+            }
+        }
+
+        if (perPlayerGrantedAbilityIds.TryGetValue(p, out var set))
+        {
+            foreach (string id in set)
+            {
+                d.grantedAbilityIds.Add(id);
+            }
+        }
+
+        return d;
+    }
+
+    public void RestoreSupervisorState(SupervisorSaveData d)
+    {
+        if (d == null)
+        {
+            return;
+        }
+
+        EventCaps = d.eventCaps != null ? new List<EventCap>(d.eventCaps) : new List<EventCap>();
+
+        GameObject p = Player.Instance?.gameObject;
+        if (p == null)
+        {
+            return;
+        }
+
+        if (!eventCounts.ContainsKey(p))
+        {
+            eventCounts[p] = new Dictionary<string, int>();
+        }
+
+        eventCounts[p].Clear();
+        for (int i = 0; i < d.eventCountIds.Count && i < d.eventCountValues.Count; i++)
+        {
+            eventCounts[p][d.eventCountIds[i]] = d.eventCountValues[i];
+        }
+
+        if (!perPlayerStatGains.ContainsKey(p))
+        {
+            perPlayerStatGains[p] = new Dictionary<StatType, int>();
+        }
+
+        perPlayerStatGains[p].Clear();
+        for (int i = 0; i < d.statGainTypes.Count && i < d.statGainValues.Count; i++)
+        {
+            perPlayerStatGains[p][d.statGainTypes[i]] = d.statGainValues[i];
+        }
+
+        if (!perPlayerGrantedAbilityIds.ContainsKey(p))
+        {
+            perPlayerGrantedAbilityIds[p] = new HashSet<string>();
+        }
+
+        perPlayerGrantedAbilityIds[p].Clear();
+        foreach (string id in d.grantedAbilityIds)
+        {
+            perPlayerGrantedAbilityIds[p].Add(id);
+
+            Ability abilityPrefab = AbilityDatabase.Instance?.GetByName(id);
+            if (abilityPrefab != null)
+            {
+                AbilityManager.Instance?.AddAbility(abilityPrefab);
+            }
+        }
+    }
 }

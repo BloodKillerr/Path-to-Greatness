@@ -7,12 +7,12 @@ public class RoomController : MonoBehaviour
     private RoomData data;
     private bool isFinished = false;
     private bool checkCompletion = false;
-    //protected List<Enemy> enemies = new List<Enemy>();
+    //protected List<Enemy> Enemies = new List<Enemy>();
 
     public bool disableCharacterControllerWhileMoving = true;
     public bool reenableNextFrame = true;
 
-    //public List<Enemy> Enemies { get => enemies; set => enemies = value; }
+    //public List<Enemy> Enemies { get => Enemies; set => Enemies = value; }
     public bool IsFinished { get => isFinished; set => isFinished = value; }
     public bool CheckCompletion { get => checkCompletion; set => checkCompletion = value; }
     public RoomData Data { get => data; set => data = value; }
@@ -31,7 +31,7 @@ public class RoomController : MonoBehaviour
 
     private void Update()
     {
-        //if (checkCompletion && !isFinished && enemies.Count == 0)
+        //if (checkCompletion && !isFinished && Enemies.Count == 0)
         //{
         //    isFinished = true;
         //}
@@ -142,9 +142,9 @@ public class RoomController : MonoBehaviour
 
     //public void RemoveEnemy(Enemy enemy)
     //{
-    //    if (enemies.Contains(enemy))
+    //    if (Enemies.Contains(enemy))
     //    {
-    //        enemies.Remove(enemy);
+    //        Enemies.Remove(enemy);
     //    }
     //}
 }

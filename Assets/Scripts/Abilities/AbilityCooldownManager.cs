@@ -58,4 +58,22 @@ public class AbilityCooldownManager
 
         nextAvailableTime.Remove(ability.GetInstanceID());
     }
+
+    public void SetCooldownRemaining(Ability ability, float remainingSeconds)
+    {
+        if (ability == null)
+        {
+            return;
+        }
+
+        int id = ability.GetInstanceID();
+
+        if (remainingSeconds <= 0f)
+        {
+            nextAvailableTime.Remove(id);
+            return;
+        }
+
+        nextAvailableTime[id] = Time.time + Mathf.Max(0f, remainingSeconds);
+    }
 }

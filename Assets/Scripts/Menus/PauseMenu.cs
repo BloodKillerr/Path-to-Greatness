@@ -43,6 +43,9 @@ public class PauseMenu : MonoBehaviour
         SavePlayerStats(data);
         SaveDungeonData(data);
         SaveEnemiesAndSpawners(data);
+        SaveSupervisor(data);
+        SaveAbilities(data);
+        SaveQuests(data);
 
         SaveManager.SaveGame(data);
         Debug.Log("Save");
@@ -86,7 +89,7 @@ public class PauseMenu : MonoBehaviour
     private void SaveEnemiesAndSpawners(MasterSaveData data)
     {
         Enemy[] enemies = FindObjectsOfType<Enemy>();
-        data.enemies = new List<EnemySaveData>(enemies.Length);
+        data.Enemies = new List<EnemySaveData>(enemies.Length);
         foreach (Enemy e in enemies)
         {
             if (e == null)
@@ -94,11 +97,11 @@ public class PauseMenu : MonoBehaviour
                 continue;
             }
 
-            data.enemies.Add(e.CollectEnemyState());
+            data.Enemies.Add(e.CollectEnemyState());
         }
 
         EnemySpawner[] spawners = FindObjectsOfType<EnemySpawner>();
-        data.spawners = new List<EnemySpawnerSaveData>(spawners.Length);
+        data.Spawners = new List<EnemySpawnerSaveData>(spawners.Length);
         foreach (EnemySpawner s in spawners)
         {
             if (s == null)
@@ -106,8 +109,74 @@ public class PauseMenu : MonoBehaviour
                 continue;
             }
 
-            data.spawners.Add(s.CollectSpawnerState());
+            data.Spawners.Add(s.CollectSpawnerState());
         }
+    }
+
+    private void SaveAbilities(MasterSaveData data)
+    {
+        if (AbilityManager.Instance == null) 
+        { 
+            data.abilityData = null; 
+            return; 
+        }
+
+        AbilitySaveData aData = new AbilitySaveData();
+
+        foreach (Ability a in AbilityManager.Instance.CurrentPassiveAbilities)
+        {
+            aData.passiveAbilityNames.Add(a?.AbilityName);
+        }
+
+        foreach (Ability a in AbilityManager.Instance.CurrentActiveAbilities)
+        {
+            aData.activeAbilityNames.Add(a?.AbilityName);
+        }
+
+        Ability[] bound = AbilityManager.Instance.BoundAbilities;
+        for (int i = 0; i < aData.boundAbilityNames.Length; i++)
+        {
+            aData.boundAbilityNames[i] = (bound != null && i < bound.Length && bound[i] != null) ? bound[i].AbilityName : null;
+        }
+
+        foreach (Ability a in AbilityManager.Instance.CurrentActiveAbilities)
+        {
+            if (a == null)
+            {
+                continue;
+            }
+
+            float rem = AbilityCooldownManager.Instance?.GetTimeRemaining(a) ?? 0f;
+            if (rem > 0f)
+            {
+                aData.cooldownAbilityNames.Add(a.AbilityName);
+                aData.cooldownsSeconds.Add(rem);
+            }
+        }
+
+        data.abilityData = aData;
+    }
+
+    private void SaveQuests(MasterSaveData data)
+    {
+        if (QuestManager.Instance == null || Player.Instance == null)
+        {
+            data.questData = null;
+            return;
+        }
+
+        data.questData = QuestManager.Instance.CollectActiveQuestsForPlayer(Player.Instance.gameObject);
+    }
+
+    private void SaveSupervisor(MasterSaveData data)
+    {
+        if (Supervisor.Instance == null)
+        {
+            data.supervisorData = null;
+            return;
+        }
+
+        data.supervisorData = Supervisor.Instance.CollectSupervisorState();
     }
 
     public void Options()

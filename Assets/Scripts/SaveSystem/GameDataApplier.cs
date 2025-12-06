@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -28,6 +29,9 @@ public class GameDataApplier : MonoBehaviour
         LoadPlayerStats(data);
         LoadDungeonData(data);
         LoadEnemiesData(data);
+        LoadSupervisorData(data);
+        LoadAbilitiesData(data);
+        LoadQuestsData(data);
 
         SaveManager.IsLoadingSave = false;
         SaveManager.LoadedData = null;
@@ -173,8 +177,8 @@ public class GameDataApplier : MonoBehaviour
             return;
         }
 
-        bool hasEnemies = data.enemies != null && data.enemies.Count > 0;
-        bool hasSpawners = data.spawners != null && data.spawners.Count > 0;
+        bool hasEnemies = data.Enemies != null && data.Enemies.Count > 0;
+        bool hasSpawners = data.Spawners != null && data.Spawners.Count > 0;
         if (!hasEnemies && !hasSpawners)
         {
             return;
@@ -190,9 +194,9 @@ public class GameDataApplier : MonoBehaviour
         }
 
         EnemySpawner[] spawnersInScene = FindObjectsOfType<EnemySpawner>();
-        if (data.spawners != null && spawnersInScene != null && spawnersInScene.Length > 0)
+        if (data.Spawners != null && spawnersInScene != null && spawnersInScene.Length > 0)
         {
-            foreach (EnemySpawnerSaveData spData in data.spawners)
+            foreach (EnemySpawnerSaveData spData in data.Spawners)
             {
                 EnemySpawner best = null;
                 float bestDist = float.MaxValue;
@@ -287,9 +291,9 @@ public class GameDataApplier : MonoBehaviour
             return null;
         }
 
-        if (data.enemies != null)
+        if (data.Enemies != null)
         {
-            foreach (EnemySaveData eData in data.enemies)
+            foreach (EnemySaveData eData in data.Enemies)
             {
                 if (eData == null)
                 {
@@ -316,4 +320,160 @@ public class GameDataApplier : MonoBehaviour
             }
         }
     }
+
+    private void LoadSupervisorData(MasterSaveData data)
+    {
+        if (data == null || data.supervisorData == null)
+        {
+            return;
+        }
+
+        if (Supervisor.Instance == null)
+        {
+            Debug.LogWarning("[GameDataApplier] Supervisor.Instance missing; skipping supervisor restore.");
+            return;
+        }
+        Supervisor.Instance.RestoreSupervisorState(data.supervisorData);
+    }
+
+    private void LoadAbilitiesData(MasterSaveData data)
+    {
+        if (data == null || data.abilityData == null)
+        {
+            return;
+        }
+
+        if (AbilityManager.Instance == null)
+        {
+            Debug.LogWarning("[GameDataApplier] AbilityManager missing; skipping abilities restore.");
+            return;
+        }
+
+        AbilitySaveData aData = data.abilityData;
+
+        AbilityManager.Instance.RemoveAllAbilities();
+
+        if (aData.passiveAbilityNames != null)
+        {
+            foreach (string name in aData.passiveAbilityNames)
+            {
+                if (string.IsNullOrEmpty(name))
+                {
+                    continue;
+                }
+
+                Ability prefab = AbilityDatabase.Instance?.GetByName(name);
+                if (prefab != null)
+                {
+                    AbilityManager.Instance.AddAbility(prefab);
+                }
+                else
+                {
+                    Debug.LogWarning($"[GameDataApplier] Ability '{name}' not found (passive).");
+                }
+            }
+        }
+
+        if (aData.activeAbilityNames != null)
+        {
+            foreach (string name in aData.activeAbilityNames)
+            {
+                if (string.IsNullOrEmpty(name))
+                {
+                    continue;
+                }
+
+                Ability prefab = AbilityDatabase.Instance?.GetByName(name);
+                if (prefab != null)
+                {
+                    AbilityManager.Instance.AddAbility(prefab);
+                }
+                else
+                {
+                    Debug.LogWarning($"[GameDataApplier] Ability '{name}' not found (active).");
+                }
+            }
+        }
+
+        if (aData.boundAbilityNames != null)
+        {
+            for (int i = 0; i < aData.boundAbilityNames.Length && i < 4; i++)
+            {
+                string bname = aData.boundAbilityNames[i];
+                if (string.IsNullOrEmpty(bname))
+                {
+                    AbilityManager.Instance.UnbindSlot(i);
+                    continue;
+                }
+
+                Ability runtime = AbilityManager.Instance.CurrentActiveAbilities.FirstOrDefault(a => a.AbilityName == bname);
+                if (runtime != null)
+                {
+                    AbilityManager.Instance.BindAbilityToSlot(runtime, i);
+                }
+                else
+                {
+                    Ability prefab = AbilityDatabase.Instance?.GetByName(bname);
+                    if (prefab != null)
+                    {
+                        AbilityManager.Instance.AddAbility(prefab);
+                        Ability added = AbilityManager.Instance.CurrentActiveAbilities.FirstOrDefault(a => a.AbilityName == bname);
+                        if (added != null)
+                        {
+                            AbilityManager.Instance.BindAbilityToSlot(added, i);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[GameDataApplier] Bound ability '{bname}' not found in database.");
+                    }
+                }
+            }
+        }
+
+        if (aData.cooldownAbilityNames != null && aData.cooldownsSeconds != null)
+        {
+            for (int i = 0; i < aData.cooldownAbilityNames.Count && i < aData.cooldownsSeconds.Count; i++)
+            {
+                string name = aData.cooldownAbilityNames[i];
+                float remaining = aData.cooldownsSeconds[i];
+                if (string.IsNullOrEmpty(name))
+                {
+                    continue;
+                }
+
+                Ability runtime = AbilityManager.Instance.CurrentActiveAbilities.FirstOrDefault(a => a.AbilityName == name)
+                           ?? AbilityManager.Instance.CurrentPassiveAbilities.FirstOrDefault(a => a.AbilityName == name);
+
+                if (runtime != null)
+                {
+                    AbilityCooldownManager.Instance?.SetCooldownRemaining(runtime, remaining);
+                }
+            }
+        }
+
+        UIManager.Instance?.UpdateAbilitiesUI();
+    }
+
+    private void LoadQuestsData(MasterSaveData data)
+    {
+        if (data == null || data.questData == null)
+        {
+            return;
+        }
+
+        if (QuestManager.Instance == null) 
+        { 
+            Debug.LogWarning("[GameDataApplier] QuestManager missing; skipping quest restore."); 
+            return; 
+        }
+        GameObject player = Player.Instance?.gameObject;
+        if (player == null)
+        {
+            return;
+        }
+
+        QuestManager.Instance.RestoreActiveQuestsForPlayer(player, data.questData);
+    }
+
 }
