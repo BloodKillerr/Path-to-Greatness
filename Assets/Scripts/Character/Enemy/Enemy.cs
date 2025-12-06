@@ -354,4 +354,57 @@ public class Enemy : MonoBehaviour, IEnemyDeathListener
         //Actions on death
         OnDeath?.Invoke();
     }
+
+    public EnemySaveData CollectEnemyState()
+    {
+        EnemySaveData s = new EnemySaveData();
+        s.position = transform.position;
+        s.rotation = transform.rotation;
+
+        if (enemyStats != null)
+        {
+            s.enemyName = enemyStats.CharacterName;
+            s.currentHealth = enemyStats.CurrentHealth;
+            s.maxHealth = enemyStats.MaxHealth;
+            s.isInvincible = enemyStats.IsInvincible;
+
+            s.groupType = enemyStats.GroupType;
+            s.enemyType = enemyStats.Type;
+        }
+        else
+        {
+            s.currentHealth = 0;
+            s.maxHealth = 0;
+            s.isInvincible = false;
+        }
+
+        return s;
+    }
+
+    public void RestoreEnemyState(EnemySaveData d)
+    {
+        if (d == null)
+        {
+            return;
+        }
+
+        transform.position = d.position;
+        transform.rotation = d.rotation;
+
+        if (enemyStats != null)
+        {
+            enemyStats.MaxHealth = d.maxHealth;
+            enemyStats.CurrentHealth = Mathf.Clamp(d.currentHealth, 0, d.maxHealth);
+            enemyStats.IsInvincible = d.isInvincible;
+
+            if (enemyStats.CurrentHealth <= 0)
+            {
+                Die();
+            }
+            else
+            {
+                enemyStats.HPChanged?.Invoke(enemyStats.CurrentHealth, enemyStats.MaxHealth);
+            }
+        }
+    }
 }

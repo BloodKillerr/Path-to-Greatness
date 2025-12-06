@@ -20,6 +20,11 @@ public class SetPlayerStartingPosition : MonoBehaviour
             TargetPlayerController = Player.Instance.GetComponent<PlayerController>();
         }
 
+        if(SaveManager.IsLoadingSave)
+        {
+            return;
+        }
+
         TriggerTeleportation();
     }
 

@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 8334851285557228846}
   - component: {fileID: 8278877367351486537}
   - component: {fileID: 304242590019404127}
+  - component: {fileID: 234995563124428832}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -407,3 +408,17 @@ MonoBehaviour:
   defaultWorldDuration: 0.8
   maxConcurrentWorldMessages: 1
   worldMessageSpacing: 0.8
+--- !u!114 &234995563124428832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7766940640006406333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f960ea57d81c5c147921e2f2a00a8be0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameDataApplier
+  disableCharacterControllerWhileMoving: 1
+  reenableNextFrame: 1

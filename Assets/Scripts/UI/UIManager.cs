@@ -329,7 +329,7 @@ public class UIManager : MonoBehaviour
         playerStats.InvokeAllStats();
     }
 
-    private void UnsubscribeStats()
+    public void UnsubscribeStats()
     {
         PlayerStats playerStats = Player.Instance.GetComponent<PlayerStats>();
         playerStats.HealthChanged.RemoveListener(OnHealthChanged);
@@ -338,6 +338,21 @@ public class UIManager : MonoBehaviour
         playerStats.MagicChanged.RemoveListener(OnMagicChanged);
         playerStats.HPChanged.RemoveListener(OnHPChanged);
         playerStats.MPChanged.RemoveListener(OnMPChanged);
+    }
+
+    public void RefreshAllUI()
+    {
+        if (Player.Instance == null)
+        {
+            return;
+        }
+
+        UnsubscribeStats();
+
+        StatsSetup();
+
+        UpdateAbilitiesUI();
+        UpdateQuestsUI();
     }
 
     private void OnHealthChanged(int baseValue, int modifierValue)

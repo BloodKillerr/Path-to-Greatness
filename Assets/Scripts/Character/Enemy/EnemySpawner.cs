@@ -31,6 +31,8 @@ public class EnemySpawner : MonoBehaviour
 
     private readonly System.Random rng = new System.Random();
 
+    public GameObject[] EnemyPrefabs { get => enemyPrefabs; set => enemyPrefabs = value; }
+
     private void Start()
     {
         if (enemyPrefabs == null || enemyPrefabs.Length == 0)
@@ -40,7 +42,7 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
-        if (spawnOnStart)
+        if (spawnOnStart && !SaveManager.IsLoadingSave)
         {
             TryScheduleSpawns();
         }
@@ -144,6 +146,33 @@ public class EnemySpawner : MonoBehaviour
             }
         }
         return transform.position;
+    }
+
+    public EnemySpawnerSaveData CollectSpawnerState()
+    {
+        return new EnemySpawnerSaveData
+        {
+            position = transform.position,
+            maxConcurrent = maxConcurrent,
+            maxTotalSpawns = maxTotalSpawns,
+            currentAlive = currentAlive,
+            pendingSpawns = pendingSpawns,
+            totalSpawned = totalSpawned
+        };
+    }
+
+    public void RestoreSpawnerState(EnemySpawnerSaveData d)
+    {
+        if (d == null)
+        {
+            return;
+        }
+
+        currentAlive = d.currentAlive;
+        pendingSpawns = d.pendingSpawns;
+        totalSpawned = d.totalSpawned;
+
+        TryScheduleSpawns();
     }
 
     #region Editor Helpers

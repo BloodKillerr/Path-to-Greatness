@@ -319,4 +319,52 @@ public class PlayerStats : CharacterStats
 
         RegainMP(1);
     }
+
+    public PlayerStatsData CollectPlayerStatsState()
+    {
+        return new PlayerStatsData
+        {
+            healthBase = health.GetBaseValue(),
+            strengthBase = strength.GetBaseValue(),
+            agilityBase = agility.GetBaseValue(),
+            magicBase = magic.GetBaseValue(),
+            currentHealth = CurrentHealth,
+            currentMP = CurrentMP,
+            maxMP = MaxMP,
+        };
+    }
+
+    public void RestorePlayerStats(PlayerStatsData d)
+    {
+        if (d == null)
+        {
+            return;
+        }
+
+        health.BaseValue = d.healthBase;
+        strength.BaseValue = d.strengthBase;
+        agility.BaseValue = d.agilityBase;
+        magic.BaseValue = d.magicBase;
+
+        MaxHealth = 10 + (health.GetValue() * 10);
+        Armor = agility.GetValue() / 2;
+        Damage = (int)(strength.GetValue() * 1.5f);
+        MaxMP = 10 + (magic.GetValue() * 2);
+
+        CurrentHealth = Mathf.Clamp(d.currentHealth, 0, MaxHealth);
+        CurrentMP = Mathf.Clamp(d.currentMP, 0, MaxMP);
+
+        lastDamageTime = Time.time;
+        lastMPUseTime = Time.time;
+
+        CancelHPRegenStart();
+        CancelInvoke(nameof(HPRegenTick));
+        ScheduleHPRegen();
+
+        CancelMPRegenStart();
+        CancelInvoke(nameof(MPRegenTick));
+        ScheduleMPRegen();
+
+        InvokeAllStats();
+    }
 }

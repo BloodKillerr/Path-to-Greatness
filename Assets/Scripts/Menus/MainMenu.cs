@@ -21,16 +21,35 @@ public class MainMenu : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         UIManager.Instance.ChangeSelectedElement(mainMenuSelectedButton.gameObject);
+
+        MasterSaveData data = SaveManager.LoadGame();
+
+        if (data == null)
+        {
+            continueButton.interactable = false;
+        }
+        else
+        {
+            continueButton.interactable = true;
+        }
     }
 
     public void StartGame()
     {
-        LoadSceneAsync.Instance.LoadScene(nextSceneIndex);
+        SaveManager.DeleteSave();
+        SceneManager.LoadScene(nextSceneIndex);
     }
 
     public void ContinueGame()
     {
+        MasterSaveData data = SaveManager.LoadGame();
 
+        if (data == null)
+        {
+            Debug.Log("[MainMenu] No valid save found. Starting a New Game instead.");
+            return;
+        }
+        SceneManager.LoadScene(data.LastSceneBuildIndex);
     }
 
     public void Options()
@@ -59,6 +78,14 @@ public class MainMenu : MonoBehaviour
 
     public void ShowNewGamePanel()
     {
+        MasterSaveData data = SaveManager.LoadGame();
+
+        if (data == null)
+        {
+            StartGame();
+            return;
+        }
+
         UIManager.Instance.TooglePanel(newGamePanel, menuPanel);
         UIManager.Instance.ChangeSelectedElement(newGameMenuSelectedButton.gameObject);
     }
