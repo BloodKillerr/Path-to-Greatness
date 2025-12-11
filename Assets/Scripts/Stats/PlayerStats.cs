@@ -367,4 +367,9 @@ public class PlayerStats : CharacterStats
 
         InvokeAllStats();
     }
+
+    public override void Die()
+    {
+        LoadSceneAsync.Instance.LoadScene(0);
+    }
 }
