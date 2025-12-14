@@ -17,9 +17,7 @@ MonoBehaviour:
     volume: 0.3
     mixer: {fileID: 705235400944241199, guid: eb46883174f602a4dbae1dacf217b263, type: 2}
     sounds:
-    - {fileID: 8300000, guid: 78da6fa86f2dfcf46a1cc5a745517891, type: 3}
-    - {fileID: 8300000, guid: 6ae5968e3b130524aa030549fbcad53d, type: 3}
-    - {fileID: 8300000, guid: 70f369c13192e5a448bec316fcb66651, type: 3}
+    - {fileID: 8300000, guid: 4c9ed516100a6ac4397470be343fde6e, type: 3}
   - type: 1
     volume: 0.5
     mixer: {fileID: 705235400944241199, guid: eb46883174f602a4dbae1dacf217b263, type: 2}
